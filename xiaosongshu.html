@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>小松鼠學習園</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=LXGW+WenKai+TC:wght@400;700&display=swap">
+<style>
+/* Layout: one centered column like a picture-book page; home = subject tabs, level cards; play = question card + big answer buttons */
+:root{
+  --bg:#E6F1EA; --surface:#FFFFFF; --ink:#1E3532; --muted:#56716B; --line:#C6DBD1;
+  --accent:#F2B02A; --accent-ink:#3A2905; --nut:#A9672F; --cap:#5B3A1E;
+  --b-nut:#3E8ED6; --b-cap:#1F4F7A; --ok:#2A9862; --err:#D65E48; --hint:#FFF3D3;
+  --math:#A9672F; --chi:#C8473B; --life:#2F8A57;
+  --soil:#E5CFAE; --plant:#3E9A55; --petal:#E77FA6; --rootc:#8C6239;
+  --f-display:"LXGW WenKai TC","Kaiti TC","BiauKai","DFKai-SB",serif;
+  --f-num:"Fredoka","Arial Rounded MT Bold",system-ui,sans-serif;
+  --f-body:"PingFang TC","Microsoft JhengHei","Noto Sans TC",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#122320; --surface:#1B302C; --ink:#E8F3EE; --muted:#9DB7B0; --line:#2D4844;
+  --accent:#F2B02A; --accent-ink:#2A1D02; --nut:#C47E43; --cap:#E2B27E;
+  --b-nut:#69AEEA; --b-cap:#BFE0FA; --ok:#47BA7F; --err:#EE7B65; --hint:#33301A;
+  --math:#D9975A; --chi:#EE7E70; --life:#5CC487;
+  --soil:#4A3A28; --plant:#5CC477; --petal:#F09CBD; --rootc:#D2A06E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#122320; --surface:#1B302C; --ink:#E8F3EE; --muted:#9DB7B0; --line:#2D4844;
+  --accent:#F2B02A; --accent-ink:#2A1D02; --nut:#C47E43; --cap:#E2B27E;
+  --b-nut:#69AEEA; --b-cap:#BFE0FA; --ok:#47BA7F; --err:#EE7B65; --hint:#33301A;
+  --math:#D9975A; --chi:#EE7E70; --life:#5CC487;
+  --soil:#4A3A28; --plant:#5CC477; --petal:#F09CBD; --rootc:#D2A06E; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;
+  background-image:radial-gradient(var(--line) 1.2px,transparent 1.2px);background-size:22px 22px}
+#app{max-width:640px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;gap:16px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 32px;box-sizing:border-box}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.acorn{display:inline-block;width:1em;height:1em;vertical-align:-.15em}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+
+.bar{display:flex;align-items:center;gap:10px;min-height:44px}
+.bar .grow{flex:1;min-width:0}
+.pill{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-size:15px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.bank{font-family:var(--f-num);font-weight:600;font-size:18px;display:inline-flex;align-items:center;gap:6px}
+
+.hero{display:flex;flex-direction:column;gap:6px;padding-block:4px}
+.hero h1{font-family:var(--f-display);font-weight:700;font-size:clamp(34px,9vw,48px);margin:0;line-height:1.15;text-wrap:balance}
+.hero p{margin:0;color:var(--muted);font-size:17px;line-height:1.6}
+.subj{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.subj button{border:3px solid var(--line);background:var(--surface);border-radius:20px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.subj .s-sym{font-family:var(--f-display);font-weight:700;font-size:30px;line-height:1.1}
+.subj .s-nm{font-family:var(--f-display);font-weight:700;font-size:20px}
+.subj .s-sub{font-size:12px;color:var(--muted)}
+.subj button[data-s="math"]{--sc:var(--math)}.subj button[data-s="chi"]{--sc:var(--chi)}.subj button[data-s="life"]{--sc:var(--life)}
+.subj .s-sym{color:var(--sc)}
+.subj button[aria-pressed="true"]{border-color:var(--sc);box-shadow:0 4px 0 var(--sc)}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mode{border:2px solid var(--line);background:var(--surface);border-radius:20px;padding:16px 14px;text-align:left;display:flex;flex-direction:column;gap:6px;min-height:150px;transition:transform .15s}
+.mode:active{transform:scale(.97)}
+.mode:last-child:nth-child(odd){grid-column:1/-1;min-height:0}
+.mode .sym{font-family:var(--f-num);font-weight:700;font-size:38px;line-height:1.1;color:var(--sc,var(--nut))}
+.mode .sym.cjk{font-family:var(--f-display)}
+.mode .nm{font-family:var(--f-display);font-weight:700;font-size:23px}
+.mode .ex{color:var(--muted);font-size:14px}
+.mode .st{margin-top:auto;display:flex;gap:2px}
+.star{width:20px;height:20px}
+.star path{fill:var(--line)}
+.star.on path{fill:var(--accent)}
+details{border-top:2px dashed var(--line);padding-top:12px;color:var(--muted);font-size:14px;line-height:1.7}
+summary{cursor:pointer;font-weight:700;color:var(--ink);font-size:15px}
+details ul{padding-left:20px;margin:8px 0}
+
+.prog{display:flex;gap:3px;flex-wrap:wrap}
+.prog span{width:22px;height:22px;display:grid;place-items:center}
+.prog svg{width:20px;height:20px}
+.prog .todo{--nut:var(--line);--cap:var(--line)}
+.prog .miss{--nut:var(--line);--cap:var(--muted);opacity:.7}
+.prog .now{outline:2px solid var(--accent);border-radius:6px}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:18px 16px;display:flex;flex-direction:column;gap:14px}
+.qrow{display:flex;align-items:flex-start;gap:10px}
+.qtext{flex:1;min-width:0;font-family:var(--f-display);font-size:24px;font-weight:700;line-height:1.4;text-wrap:balance}
+.speak{flex:none;width:46px;height:46px;border-radius:50%;border:2px solid var(--line);background:var(--bg);display:grid;place-items:center}
+.speak svg{width:22px;height:22px;fill:var(--ink)}
+.formula{font-family:var(--f-num);font-weight:700;font-size:clamp(34px,10vw,46px);text-align:center;letter-spacing:.04em}
+.formula.cjk{font-family:var(--f-display)}
+.formula .q{color:var(--nut)}
+.visual{display:flex;flex-direction:column;align-items:center;gap:6px;overflow-x:auto}
+.pic{font-size:84px;line-height:1.15;text-align:center}
+.picw{font-family:var(--f-display);font-weight:700;font-size:40px;text-align:center;line-height:1.2}
+.picw.huge{font-size:92px}
+.zybig{font-family:var(--f-display);font-weight:700;font-size:64px;letter-spacing:.06em;padding:4px 24px;border:3px dashed var(--chi);border-radius:20px;color:var(--chi)}
+
+.frames{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.frame{display:grid;grid-template-columns:repeat(5,26px);gap:4px;padding:6px;border:2px solid var(--line);border-radius:12px;background:var(--bg)}
+.cell{width:26px;height:26px;display:grid;place-items:center;position:relative}
+.cell svg{width:24px;height:24px}
+.cell.b{--nut:var(--b-nut);--cap:var(--b-cap)}
+.cell.x svg{opacity:.3}
+.cell.x::after{content:"";position:absolute;left:2px;right:2px;top:50%;height:3px;background:var(--err);transform:rotate(-40deg);border-radius:2px}
+.cmp{display:flex;align-items:flex-start;justify-content:center;gap:12px;flex-wrap:wrap}
+.side{display:flex;flex-direction:column;align-items:center;gap:8px}
+.side .big{font-family:var(--f-num);font-weight:700;font-size:48px;line-height:1}
+.side .frame{grid-template-columns:repeat(5,16px);gap:3px;padding:4px}
+.side .cell{width:16px;height:16px}.side .cell svg{width:15px;height:15px}
+.slot{width:64px;height:64px;border:3px dashed var(--nut);border-radius:16px;display:grid;place-items:center;font-family:var(--f-num);font-size:40px;font-weight:700;color:var(--nut);margin-top:-6px}
+
+.plant{width:200px;max-width:100%;height:auto}
+.plant .part{opacity:.32;transition:opacity .2s}
+.plant .part.hl{opacity:1;filter:drop-shadow(0 0 6px var(--accent))}
+.plant .hl-ring{fill:none;stroke:var(--accent);stroke-width:3;stroke-dasharray:6 5}
+
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opts.three{grid-template-columns:repeat(3,1fr)}
+.opts.one{grid-template-columns:1fr}
+.opt{min-height:78px;border-radius:20px;border:3px solid var(--line);background:var(--surface);font-family:var(--f-num);font-weight:700;font-size:36px;box-shadow:0 4px 0 var(--line);transition:transform .1s;padding:6px 8px;line-height:1.25}
+.opt.word{font-family:var(--f-display);font-size:clamp(19px,5.4vw,24px)}
+.opt.wordbig{font-family:var(--f-display);font-size:38px}
+.opt.zy{font-family:var(--f-display);font-size:clamp(24px,7vw,30px);letter-spacing:.05em}
+.opts.one .opt{min-height:64px}
+.opt:active{transform:translateY(3px);box-shadow:0 1px 0 var(--line)}
+.opt.right{border-color:var(--ok);background:var(--ok);color:#fff;box-shadow:0 4px 0 color-mix(in srgb,var(--ok) 60%,#000)}
+.opt.wrong{border-color:var(--err);color:var(--err);opacity:.55}
+.opt:disabled{cursor:default}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(6px)}75%{transform:translateX(-4px)}}
+.hint{background:var(--hint);border-radius:16px;padding:12px 14px;font-size:18px;line-height:1.6;font-weight:600}
+.big-btn{border:0;border-radius:18px;background:var(--accent);color:var(--accent-ink);font-family:var(--f-display);font-weight:700;font-size:22px;padding:14px 20px;box-shadow:0 4px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+.ghost-btn{border:2px solid var(--line);border-radius:18px;background:var(--surface);font-family:var(--f-display);font-weight:700;font-size:20px;padding:12px 18px}
+
+.result{text-align:center;align-items:center}
+.result .stars{display:flex;gap:8px;justify-content:center}
+.result .star{width:64px;height:64px}
+.result h2{font-family:var(--f-display);font-size:32px;margin:0}
+.result p{margin:0;font-size:18px;color:var(--muted);line-height:1.6}
+.row-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.pop{animation:pop .4s ease-out backwards}
+@keyframes pop{from{transform:scale(.4);opacity:0}}
+@media (max-width:380px){.opt{font-size:30px;min-height:70px}@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <section id="home" style="display:flex;flex-direction:column;gap:16px">
+    <div class="bar"><div class="grow"></div><span class="bank" title="收集到的橡實"><span class="acorn" data-acorn></span><span id="bankNum">0</span></span><button class="pill" id="sndBtn1" aria-pressed="true">聲音 開</button></div>
+    <div class="hero">
+      <h1>小松鼠學習園</h1>
+      <p>給一年級小朋友的練習。冬天快到了，幫小松鼠收集橡實吧！每一關 10 題，答對就多一顆橡實。</p>
+    </div>
+    <div class="subj" role="group" aria-label="選科目">
+      <button data-s="math" aria-pressed="true"><span class="s-sym">123</span><span class="s-nm">數學</span></button>
+      <button data-s="chi" aria-pressed="false"><span class="s-sym">ㄅㄆ</span><span class="s-nm">國語</span></button>
+      <button data-s="life" aria-pressed="false"><span class="s-sym">🌱</span><span class="s-nm">生活</span><span class="s-sub">自然</span></button>
+    </div>
+    <div class="modes" id="modes"></div>
+    <details>
+      <summary>給家長和老師</summary>
+      <ul>
+        <li><b>數學</b>：20 以內的數數、加減法（用十格框看「湊十」）和比大小。</li>
+        <li><b>國語</b>：注音拼讀（看圖選注音）、認國字（看注音選字）、量詞、筆順、相反詞。筆順題依教育部標準字體的基本規則（先橫後豎、先撇後捺、由上而下、由左而右、先中間後兩邊、先外後內、最後封口）。</li>
+        <li><b>生活（自然）</b>：一、二年級沒有獨立的自然科，自然內容在「生活課程」裡。這裡選的是動物、植物部位、天氣季節、垃圾分類。</li>
+        <li>垃圾分類的細節各縣市可能不同（例如紙餐具），遊戲只放分類方式較一致的物品，實際仍以居住地環保局公告為準。</li>
+        <li>答錯會出現提示並可再試一次；錯兩次會顯示答案。星星只計算「第一次就答對」的題數。進度只存在這台裝置的瀏覽器裡。</li>
+      </ul>
+    </details>
+  </section>
+
+  <section id="play" hidden style="flex-direction:column;gap:14px">
+    <div class="bar">
+      <button class="pill" id="backBtn">← 回選單</button>
+      <div class="grow"></div>
+      <button class="pill" id="sndBtn2" aria-pressed="true">聲音 開</button>
+    </div>
+    <div class="prog" id="prog" aria-label="進度"></div>
+    <div class="card">
+      <div class="qrow">
+        <div class="qtext" id="qtext"></div>
+        <button class="speak" id="speakBtn" aria-label="唸題目"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg></button>
+      </div>
+      <div class="formula" id="formula"></div>
+      <div class="visual" id="visual"></div>
+    </div>
+    <div class="opts" id="opts"></div>
+    <div class="hint" id="hint" hidden></div>
+    <button class="big-btn" id="nextBtn" hidden>下一題 →</button>
+  </section>
+
+  <section id="done" hidden style="flex-direction:column;gap:16px">
+    <div class="bar"><div class="grow"></div><span class="bank"><span class="acorn" data-acorn></span><span id="bankNum2">0</span></span></div>
+    <div class="card result">
+      <div class="stars" id="resStars"></div>
+      <h2 id="resTitle"></h2>
+      <p id="resText"></p>
+      <div class="row-btns">
+        <button class="big-btn" id="againBtn">再玩一次</button>
+        <button class="ghost-btn" id="menuBtn">換別的關卡</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+const ACORN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.8v3.4" stroke="var(--cap)" stroke-width="2.2" stroke-linecap="round"/><path d="M3.6 10.2C3.6 6.6 7.3 4.4 12 4.4s8.4 2.2 8.4 5.8z" fill="var(--cap)"/><path d="M5.2 10.2h13.6c0 6.4-3.1 11-6.8 12.2-3.7-1.2-6.8-5.8-6.8-12.2z" fill="var(--nut)"/></svg>';
+const STAR='<svg class="star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg>';
+document.querySelectorAll('[data-acorn]').forEach(e=>e.innerHTML=ACORN);
+
+const MODES={
+ math:{
+  1:[{id:'count',nm:'數一數',sym:'123',ex:'數到 20'},{id:'add1',nm:'加法',sym:'+',ex:'例如 8 + 5'},{id:'sub1',nm:'減法',sym:'−',ex:'例如 13 − 6'},{id:'cmp1',nm:'比大小',sym:'&gt;&lt;',ex:'20 以內'}]},
+ chi:{
+  1:[{id:'zy1',nm:'注音拼讀',sym:'ㄅㄆ',ex:'看圖選注音',cjk:1},{id:'zi1',nm:'認國字',sym:'字',ex:'看注音選字',cjk:1},{id:'lc1',nm:'量詞',sym:'一隻',ex:'一（　）貓',cjk:1},{id:'bh1',nm:'筆順',sym:'十',ex:'先寫哪一筆、有幾畫',cjk:1},{id:'fx1',nm:'相反詞',sym:'大小',ex:'大的相反是小',cjk:1}]},
+ life:{
+  1:[{id:'an1',nm:'動物',sym:'🐸',ex:'會飛、會游、幾隻腳'},{id:'pl1',nm:'植物',sym:'🌱',ex:'根、莖、葉、花'},{id:'wx1',nm:'天氣季節',sym:'☀️',ex:'晴天、雨天、四季'},{id:'tr1',nm:'垃圾分類',sym:'♻️',ex:'回收、廚餘、一般'}]}
+};
+const SUBJ_COLOR={math:'var(--math)',chi:'var(--chi)',life:'var(--life)'};
+const ROUND=10;
+const $=id=>document.getElementById(id);
+
+/* ---------- 國語題庫 ---------- */
+const Q=(q,a,w,h,pic)=>({q,a,w,h,pic});
+// [詞, 圖, 正確注音, 錯誤選項]
+const ZY1=[['貓','🐱','ㄇㄠ',['ㄇㄠˊ','ㄋㄠ','ㄇㄡ']],['狗','🐶','ㄍㄡˇ',['ㄍㄡˋ','ㄎㄡˇ','ㄍㄠˇ']],['魚','🐟','ㄩˊ',['ㄩˇ','ㄧˊ','ㄨˊ']],['鳥','🐦','ㄋㄧㄠˇ',['ㄌㄧㄠˇ','ㄋㄧㄠˋ','ㄋㄧㄡˇ']],
+ ['牛','🐮','ㄋㄧㄡˊ',['ㄌㄧㄡˊ','ㄋㄧㄡˇ','ㄋㄧㄠˊ']],['羊','🐑','ㄧㄤˊ',['ㄧㄢˊ','ㄧㄤˇ','ㄩㄥˊ']],['馬','🐴','ㄇㄚˇ',['ㄇㄚˊ','ㄋㄚˇ','ㄇㄛˇ']],['花','🌸','ㄏㄨㄚ',['ㄏㄨㄚˊ','ㄏㄨㄛ','ㄎㄨㄚ']],
+ ['書','📕','ㄕㄨ',['ㄙㄨ','ㄕㄨˊ','ㄕㄡ']],['山','⛰️','ㄕㄢ',['ㄙㄢ','ㄕㄤ','ㄕㄢˇ']],['雨','🌧️','ㄩˇ',['ㄩˊ','ㄧˇ','ㄨˇ']],['火','🔥','ㄏㄨㄛˇ',['ㄏㄨㄛˋ','ㄏㄨㄚˇ','ㄎㄨㄛˇ']],
+ ['球','⚽','ㄑㄧㄡˊ',['ㄑㄧㄡˇ','ㄐㄧㄡˊ','ㄑㄧㄠˊ']],['蛋','🥚','ㄉㄢˋ',['ㄉㄤˋ','ㄊㄢˋ','ㄉㄢˇ']],['車','🚗','ㄔㄜ',['ㄘㄜ','ㄔㄜˋ','ㄕㄜ']],['手','✋','ㄕㄡˇ',['ㄕㄡˋ','ㄙㄡˇ','ㄕㄠˇ']],
+ ['月','🌙','ㄩㄝˋ',['ㄧㄝˋ','ㄩㄝˊ','ㄩㄢˋ']],['星','⭐','ㄒㄧㄥ',['ㄒㄧㄣ','ㄒㄧㄥˊ','ㄐㄧㄥ']],['蝦','🦐','ㄒㄧㄚ',['ㄒㄧㄚˊ','ㄐㄧㄚ','ㄒㄧㄝ']],['鴨','🦆','ㄧㄚ',['ㄧㄚˊ','ㄧㄝ','ㄧㄚˇ']],
+ ['兔','🐰','ㄊㄨˋ',['ㄉㄨˋ','ㄊㄨˇ','ㄊㄡˋ']],['豬','🐷','ㄓㄨ',['ㄗㄨ','ㄓㄨˊ','ㄔㄨ']],['傘','☂️','ㄙㄢˇ',['ㄕㄢˇ','ㄙㄤˇ','ㄙㄢˋ']],['門','🚪','ㄇㄣˊ',['ㄇㄥˊ','ㄇㄣˇ','ㄋㄣˊ']]];
+// [注音, 正確字, 錯誤字, 提示詞]
+const ZI1=[['ㄉㄚˋ','大',['太','天','犬'],'大人'],['ㄒㄧㄠˇ','小',['少','水','川'],'小狗'],['ㄕㄢ','山',['出','川','三'],'爬山'],['ㄕㄨㄟˇ','水',['木','永','冰'],'喝水'],
+ ['ㄇㄨˋ','木',['本','未','禾'],'木頭'],['ㄖˋ','日',['目','白','月'],'日出'],['ㄩㄝˋ','月',['日','目','用'],'月亮'],['ㄖㄣˊ','人',['入','八','大'],'好人'],
+ ['ㄎㄡˇ','口',['日','中','回'],'開口'],['ㄕㄡˇ','手',['毛','牛','午'],'小手'],['ㄊㄧㄢ','天',['夫','大','犬'],'天空'],['ㄏㄨㄛˇ','火',['大','水','米'],'火車'],
+ ['ㄕㄤˋ','上',['下','土','止'],'上面'],['ㄒㄧㄚˋ','下',['上','不','丁'],'下面'],['ㄓㄨㄥ','中',['申','由','千'],'中間'],['ㄇㄧˇ','米',['木','半','禾'],'白米'],
+ ['ㄊㄨˇ','土',['士','上','工'],'泥土'],['ㄍㄨㄥ','工',['土','干','王'],'工人'],['ㄨㄤˊ','王',['玉','主','土'],'國王']];
+// [名詞, 圖, 正確量詞, 錯誤, 提示]
+const LC1=[['貓','🐱','隻',['本','朵','輛'],'小動物常用「隻」'],['花','🌸','朵',['隻','本','輛'],'一朵一朵開的是花'],['書','📕','本',['朵','隻','輛'],'可以翻開來讀的用「本」'],
+ ['汽車','🚗','輛',['本','朵','隻'],'有輪子的車子用「輛」'],['魚','🐟','條',['本','朵','輛'],'身體長長的魚用「條」'],['鉛筆','✏️','枝',['張','朵','隻'],'細細長長的筆用「枝」'],
+ ['紙','📄','張',['枝','朵','輛'],'薄薄平平的東西用「張」'],['樹','🌳','棵',['朵','本','輛'],'長在土裡的樹用「棵」'],['衣服','👕','件',['朵','輛','枝'],'衣服用「件」'],
+ ['鞋子','👟','雙',['朵','本','輛'],'兩個成一對的東西用「雙」'],['鳥','🐦','隻',['本','張','輛'],'鳥是動物，常用「隻」'],['蘋果','🍎','顆',['張','本','輛'],'圓圓的水果可以用「顆」'],
+ ['雨傘','☂️','把',['張','朵','本'],'有把手可以握的東西常用「把」'],['山','⛰️','座',['朵','張','輛'],'又高又大的山用「座」']];
+// 筆順：規則題依教育部常用國字標準字體筆順的基本規則
+const BHQ=[Q('寫「十」，要先寫哪一筆？','橫',['豎（直）'],'規則是「先橫後豎」'),Q('寫「人」，要先寫哪一筆？','撇',['捺'],'規則是「先撇後捺」，撇是往左下的那一筆'),
+ Q('寫「八」，要先寫哪一筆？','左邊的撇',['右邊的捺'],'規則是「先撇後捺」'),Q('寫「三」，要從哪一橫開始寫？','最上面',['中間','最下面'],'規則是「由上而下」'),
+ Q('寫「川」，要從哪一筆開始寫？','左邊',['中間','右邊'],'規則是「由左而右」'),Q('寫「小」，要先寫哪裡？','中間的豎鉤',['左邊的點','右邊的點'],'規則是「先中間，後兩邊」'),
+ Q('寫「日」，最後一筆寫哪裡？','最下面的橫',['左邊的豎（直）','中間的橫'],'先寫外框和裡面，最後才封口'),Q('寫「口」，最後一筆寫哪裡？','下面的橫',['左邊的豎（直）','右上的轉彎'],'最後才把口封起來'),
+ Q('寫「月」，要先寫外面還是裡面？','外面',['裡面'],'規則是「先外後內」')];
+// 筆畫數：[字, 畫數]
+const BHN=[['人',2],['十',2],['八',2],['大',3],['口',3],['山',3],['上',3],['下',3],['土',3],['小',3],['日',4],['月',4],['木',4],['天',4],['王',4],['中',4],['水',4],['火',4],['手',4],['田',5],['目',5]];
+// 相反詞：[詞, 相反詞, 錯誤, 提示句]
+const FX=[['大','小',['多','高','長'],'大象很大，螞蟻很（　）'],['上','下',['前','左','中'],'天空在上面，地板在（　）面'],['多','少',['小','大','短'],'一大堆糖果很多，一顆糖果很（　）'],
+ ['長','短',['小','矮','少'],'長頸鹿的脖子很長，兔子的尾巴很（　）'],['高','矮',['小','短','少'],'長頸鹿很高，小狗很（　）'],['胖','瘦',['小','矮','短'],'吃得太多會變胖，吃得太少會變（　）'],
+ ['黑','白',['紅','綠','藍'],'烏鴉是黑色的，白雲是（　）色的'],['冷','熱',['涼','冰','溫'],'冬天很冷，夏天很（　）'],['開','關',['進','出','放'],'早上把門打開，晚上把門（　）起來'],
+ ['前','後',['上','左','外'],'排隊時我在你前面，你在我（　）面'],['左','右',['上','前','下'],'我有左手，也有（　）手'],['快','慢',['早','晚','遠'],'兔子跑得快，烏龜爬得（　）'],
+ ['哭','笑',['叫','唱','說'],'難過的時候會哭，開心的時候會（　）'],['早','晚',['快','慢','新'],'早上起床，（　）上睡覺'],['新','舊',['大','好','長'],'新買的鞋子，穿了很久會變（　）'],
+ ['輕','重',['大','高','多'],'羽毛很輕，石頭很（　）'],['遠','近',['快','長','高'],'學校離家很遠，便利商店離家很（　）'],['進','出',['來','開','上'],'下課了，大家走（　）教室'],
+ ['軟','硬',['輕','冷','乾'],'棉花很軟，石頭很（　）'],['乾','濕',['冷','輕','軟'],'晒好的衣服是乾的，剛洗好的衣服是（　）的']];
+
+/* ---------- 生活（自然）題庫 ---------- */
+const AN1=[Q('哪一種動物會飛？','🐦 小鳥',['🐶 小狗','🐟 魚','🐢 烏龜'],'有翅膀的動物會飛'),Q('哪一種動物住在水裡？','🐟 魚',['🐱 貓','🐔 雞','🐰 兔子'],'用鰭游泳的動物住在水裡'),
+ Q('哪一種動物有長長的鼻子？','🐘 大象',['🦒 長頸鹿','🐒 猴子','🐻 熊'],'牠會用鼻子拿東西、噴水'),Q('哪一種動物的脖子最長？','🦒 長頸鹿',['🐘 大象','🐷 豬','🐑 羊'],'牠可以吃到很高的樹葉'),
+ Q('哪一種動物背著硬硬的殼？','🐢 烏龜',['🐰 兔子','🐶 小狗','🐱 貓'],'遇到危險會把頭縮進殼裡'),Q('青蛙小時候叫做什麼？','蝌蚪',['毛毛蟲','小魚','小雞'],'牠小時候有尾巴，住在水裡'),
+ Q('蝴蝶小時候是什麼樣子？','毛毛蟲',['蝌蚪','小魚','小鳥'],'牠小時候會吃葉子，後來變成蛹'),Q('雞有幾隻腳？','2 隻',['4 隻','6 隻','8 隻'],'雞和小鳥一樣用兩隻腳走路'),
+ Q('小狗有幾隻腳？','4 隻',['2 隻','6 隻','8 隻'],'數一數前腳和後腳'),Q('小雞是怎麼出生的？','從蛋裡孵出來',['從土裡長出來','從水裡游出來','從樹上掉下來'],'雞媽媽會坐在蛋上孵蛋')];
+const PARTS={root:['根','它長在土裡，會吸水'],stem:['莖','它在中間，撐住整棵植物'],leaf:['葉','它綠綠的、扁扁的'],flower:['花','它有漂亮的花瓣']};
+const PL1=[Q('植物的哪個部位會吸收土裡的水？','根',['花','葉','果實'],'它長在土裡面'),Q('蜜蜂最喜歡停在植物的哪個部位？','花',['根','莖','種子'],'這個部位顏色很漂亮，還有花蜜'),
+ Q('把什麼種在土裡，會長出新的植物？','種子',['葉子','花瓣','石頭'],'它常常藏在果實裡面'),Q('種子發芽需要什麼？','水',['糖','鹽巴','果汁'],'記得每天幫它澆一點'),
+ Q('植物要長得好，需要什麼？','陽光',['糖果','鹽巴','牛奶'],'把植物放在窗邊曬一曬'),Q('我們吃的蘋果，是植物的哪個部位？','果實',['根','莖','葉'],'它是花謝了以後長出來的')];
+const WX1=[Q('這是什麼天氣？','晴天',['陰天','雨天','下雪'],'天上有大太陽','☀️'),Q('這是什麼天氣？','雨天',['晴天','陰天','下雪'],'天上在下雨','🌧️'),
+ Q('這是什麼天氣？','陰天',['晴天','雨天','下雪'],'天上都是雲，看不到太陽','☁️'),Q('這是什麼天氣？','雷雨',['晴天','陰天','下雪'],'有閃電又在下雨','⛈️'),
+ Q('下雨天出門要帶什麼？','☂️ 雨傘',['🕶️ 太陽眼鏡','🪁 風箏','🧸 玩具熊'],'可以擋雨的東西'),Q('一年有幾個季節？','4 個',['2 個','3 個','12 個'],'春、夏、秋、冬'),
+ Q('哪個季節最熱？','夏天',['春天','秋天','冬天'],'這個季節可以去游泳、吃冰'),Q('哪個季節最冷？','冬天',['春天','夏天','秋天'],'這個季節要穿厚外套'),
+ Q('颱風來的時候，應該怎麼做？','待在家裡',['去海邊玩','去爬山','去放風箏'],'颱風的風雨很大，在外面很危險'),Q('天氣很熱的時候，要記得做什麼？','多喝水',['穿厚外套','一直曬太陽','不吃東西'],'流很多汗，身體需要補充水分')];
+// 垃圾分類：[物品, 圖, 類別, 提示]
+const TR_OPTS=[{v:'資源回收',l:'♻️ 資源回收'},{v:'廚餘',l:'🍂 廚餘'},{v:'一般垃圾',l:'🗑️ 一般垃圾'}];
+const TR1=[['寶特瓶','','資源回收','塑膠瓶倒乾淨，可以回收再利用'],['鐵罐','🥫','資源回收','鐵罐、鋁罐都可以回收'],['鋁罐（汽水罐）','','資源回收','鐵罐、鋁罐都可以回收'],
+ ['報紙','📰','資源回收','紙類可以回收做成再生紙'],['紙箱','📦','資源回收','紙箱壓平就可以回收'],['香蕉皮','🍌','廚餘','吃剩的果皮是廚餘'],['剩飯','🍚','廚餘','吃剩的飯菜是廚餘'],
+ ['蘋果核','🍎','廚餘','吃剩的果核是廚餘'],['菜葉','🥬','廚餘','不要的菜葉是廚餘'],['用過的衛生紙','🧻','一般垃圾','用過的衛生紙不能回收'],['紙尿布','','一般垃圾','紙尿布不能回收']];
+
+
+/* storage */
+let save={total:0,best:{},subject:'math'};
+try{const s=JSON.parse(localStorage.getItem('sqmath-v1')||'null');if(s)save=Object.assign(save,s);}catch(e){}
+if(!MODES[save.subject])save.subject='math';
+function persist(){try{localStorage.setItem('sqmath-v1',JSON.stringify(save));}catch(e){}}
+
+/* sound */
+let soundOn=true,actx=null;
+function tone(freqs,dur){if(!soundOn)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();freqs.forEach((f,i)=>{const o=actx.createOscillator(),g=actx.createGain();o.type='triangle';o.frequency.value=f;const t=actx.currentTime+i*dur;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.25,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+dur+0.02);});}catch(e){}}
+const clean=t=>String(t).replace(/[^一-鿿㄀-ㄯ0-9A-Za-z，。？、！ ]/g,'');
+function say(t){if(!soundOn)return;try{if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(clean(t));u.lang='zh-TW';u.rate=0.85;speechSynthesis.speak(u);}}catch(e){}}
+function setSound(v){soundOn=v;['sndBtn1','sndBtn2'].forEach(id=>{$(id).textContent=v?'聲音 開':'聲音 關';$(id).setAttribute('aria-pressed',v);});if(!v){try{speechSynthesis.cancel();}catch(e){}}}
+$('sndBtn1').onclick=$('sndBtn2').onclick=()=>setSound(!soundOn);
+
+/* helpers */
+const rand=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pick=arr=>{const i=Math.floor(Math.random()*arr.length);return [i,arr[i]];};
+function numOpts(ans,extra){
+  const ok=v=>Number.isInteger(v)&&v>=0&&v!==ans;
+  const close=shuffle([ans+1,ans-1].filter(ok));
+  const pool=new Set((extra||[]).filter(ok));
+  [2,-2,10,-10,3,-3,5,-5,9,-9,11,-11].forEach(o=>ok(ans+o)&&pool.add(ans+o));
+  const picks=[];if(close.length)picks.push(close[0]);
+  shuffle([...pool]).forEach(v=>{if(picks.length<3&&!picks.includes(v))picks.push(v);});
+  close.forEach(v=>{if(picks.length<3&&!picks.includes(v))picks.push(v);});
+  return shuffle([ans,...picks.slice(0,3)]);
+}
+function frames(list,max){
+  const total=Math.max(list.length,max||0),n=Math.ceil(total/10)||1;let h='<div class="frames">';
+  for(let f=0;f<n;f++){h+='<div class="frame">';for(let c=0;c<10;c++){const t=list[f*10+c];h+=t?`<span class="cell ${t}">${ACORN}</span>`:'<span class="cell"></span>';}h+='</div>';}
+  return h+'</div>';
+}
+const rep=(t,n)=>Array(n).fill(t);
+function plantSVG(hl){
+  const c=p=>'part'+(p===hl?' hl':'');
+  const petals=[0,72,144,216,288].map(a=>{const r=a*Math.PI/180;return `<circle cx="${(100+13*Math.sin(r)).toFixed(1)}" cy="${(42-13*Math.cos(r)).toFixed(1)}" r="11" fill="var(--petal)"/>`;}).join('');
+  return `<svg class="plant" viewBox="0 0 200 200" role="img" aria-label="一棵植物的根、莖、葉、花">
+  <rect x="0" y="130" width="200" height="70" rx="10" fill="var(--soil)"/>
+  <g class="${c('root')}" stroke="var(--rootc)" stroke-width="4" stroke-linecap="round" fill="none"><path d="M100 130V176M100 144L78 166M100 150L124 172M100 160L86 188M100 166L114 190"/></g>
+  <g class="${c('stem')}"><path d="M100 132V56" stroke="var(--plant)" stroke-width="8" stroke-linecap="round" fill="none"/></g>
+  <g class="${c('leaf')}" fill="var(--plant)"><ellipse cx="76" cy="102" rx="24" ry="10" transform="rotate(-28 76 102)"/><ellipse cx="124" cy="86" rx="24" ry="10" transform="rotate(28 124 86)"/></g>
+  <g class="${c('flower')}">${petals}<circle cx="100" cy="42" r="8" fill="var(--accent)"/></g>
+  </svg>`;
+}
+const quizQ=(item,id,i,style)=>({key:id+i,text:item.q,speak:item.q,formula:'',visual:item.pic?`<div class="pic">${item.pic}</div>`:'',ans:item.a,opts:shuffle([item.a,...item.w]),optStyle:style||'word',hint:item.h});
+
+/* question generators */
+const GEN={
+  count(){const n=rand(5,20);return{key:'c'+n,text:'數一數，有幾顆橡實？',speak:'數一數，有幾顆橡實？',formula:'',visual:frames(rep('a',n)),ans:n,opts:numOpts(n),
+    hint:'用手指一顆一顆點著數。一個框裝滿是 10 顆，再接著數下一個框。'};},
+  add1(){const a=rand(3,12),b=rand(2,Math.min(9,20-a));return{key:a+'+'+b,text:'兩堆橡實合起來有幾顆？',speak:`${a}加${b}等於多少？`,formula:`${a} + ${b} = <span class="q" id="fq">?</span>`,
+    visual:frames(rep('a',a).concat(rep('b',b))),ans:a+b,opts:numOpts(a+b),hint:`先記住 ${a}，再往後數 ${b} 個。看看框有沒有裝滿 10 顆，滿了就是 10 再加剩下的。`};},
+  sub1(){const a=rand(6,20),b=rand(2,Math.min(9,a-1));return{key:a+'-'+b,text:'小松鼠吃掉一些，還剩幾顆？',speak:`${a}減${b}等於多少？`,formula:`${a} − ${b} = <span class="q" id="fq">?</span>`,
+    visual:frames(rep('a',a-b).concat(rep('x',b))),ans:a-b,opts:numOpts(a-b),hint:`畫線的 ${b} 顆被吃掉了，數一數沒有畫線的還有幾顆。`};},
+  cmp1(){const a=rand(1,20);let b=Math.random()<0.15?a:rand(1,20);const s=a>b?'>':a<b?'<':'=';
+    const side=n=>`<div class="side"><div class="big">${n}</div>${frames(rep('a',n),10)}</div>`;
+    return{key:a+'?'+b,text:'哪一邊比較多？選出正確的符號。',speak:`${a}和${b}，哪一個比較大？選出正確的符號。`,formula:'',
+      visual:`<div class="cmp">${side(a)}<div class="slot" id="slot">?</div>${side(b)}</div>`,ans:s,opts:['>','<','='],three:true,ansSay:s==='>'?'大於':s==='<'?'小於':'等於',
+      hint:'開口朝向比較多的那一邊，像鱷魚張大嘴巴吃多的。一樣多就選「=」。'};},
+  zy1(){return zyQ(ZY1,'zy1');},
+  zi1(){return ziQ(ZI1,'zi1');},
+  lc1(){return lcQ(LC1,'lc1');},
+  bh1(){
+    if(Math.random()<0.5){const [i,it]=pick(BHQ);const q=quizQ(it,'bhq',i);q.optStyle=[it.a,...it.w].some(w=>w.length>2)?'word':'wordbig';return q;}
+    const [i,[c,n]]=pick(BHN);
+    return{key:'bhn'+i,text:`「${c}」總共有幾畫？`,speak:`${c}，總共有幾畫？`,formula:'',visual:`<div class="picw huge">${c}</div>`,ans:n,
+      opts:shuffle([n,...shuffle([1,2,3,4,5,6,7].filter(x=>x!==n&&Math.abs(x-n)<=3)).slice(0,3)]),hint:'用手指在空中寫寫看，寫一筆數一下，轉彎的地方也算一筆，不要漏掉。'};},
+  fx1(){const [i,[w,a,ws,h]]=pick(FX);
+    return{key:'fx'+i,text:`「${w}」的相反詞是什麼？`,speak:`${w}，的相反詞是什麼？`,formula:`${w} ↔ <span class="q" id="fq">？</span>`,cjk:true,visual:'',
+      ans:a,opts:shuffle([a,...ws]),optStyle:'wordbig',hint:'想想看這句話：'+h};},
+  an1(){const [i,it]=pick(AN1);return quizQ(it,'an1',i);},
+  pl1(){
+    if(Math.random()<0.4){const keys=Object.keys(PARTS);const k=keys[rand(0,3)];const [nm,h]=PARTS[k];
+      return{key:'pd'+k,text:'發亮的地方是植物的哪個部位？',speak:'發亮的地方，是植物的哪個部位？',formula:'',visual:plantSVG(k),ans:nm,opts:['根','莖','葉','花'],optStyle:'wordbig',hint:h};}
+    const [i,it]=pick(PL1);return quizQ(it,'pl1',i);},
+  wx1(){const [i,it]=pick(WX1);return quizQ(it,'wx1',i);},
+  tr1(){return trQ(TR1,'tr1');}
+};
+function zyQ(bank,id){const [i,[w,e,a,ws]]=pick(bank);
+  return{key:id+i,text:'這是什麼？選出正確的注音。',speak:`${w}。${w}的注音是哪一個？`,formula:'',visual:`<div class="pic">${e}</div><div class="picw">${w}</div>`,
+    ans:a,ansSay:w,opts:shuffle([a,...ws]),optStyle:'zy',hint:'唸唸看，再注意聲調：一聲不標，ˊ 是二聲，ˇ 是三聲，ˋ 是四聲。'};}
+function ziQ(bank,id){const [i,[zy,c,ws,word]]=pick(bank);
+  return{key:id+i,text:'這個注音是哪一個字？',speak:`哪一個字唸作，${c}？`,formula:'',visual:`<div class="zybig">${zy}</div>`,
+    ans:c,opts:shuffle([c,...ws]),optStyle:'wordbig',hint:`想想看這個詞語：「${word.replace(c,'＿')}」`};}
+function lcQ(bank,id){const [i,[n,e,a,ws,h]]=pick(bank);
+  return{key:id+i,text:'要用哪一個量詞？',speak:`一什麼${n}？`,formula:`一 <span class="q" id="fq">（　）</span> ${n}`,cjk:true,visual:`<div class="pic">${e}</div>`,
+    ans:a,ansSay:'一'+a+n,opts:shuffle([a,...ws]),optStyle:'wordbig',hint:h};}
+function trQ(bank,id){
+  const [i,[n,e,c,h]]=pick(bank);
+  return{key:id+i,text:'這個要丟到哪裡？',speak:`${n}要丟到哪裡？`,formula:'',visual:(e?`<div class="pic">${e}</div>`:'')+`<div class="picw">${n}</div>`,
+    ans:c,opts:TR_OPTS.slice(),optStyle:'word',one:true,hint:h};}
+
+/* state */
+let S=null;
+function show(id){['home','play','done'].forEach(s=>{$(s).hidden=s!==id;if(s===id)$(s).style.display='flex';});window.scrollTo(0,0);}
+function renderHome(){
+  $('bankNum').textContent=save.total;
+  document.querySelectorAll('.subj button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===save.subject));
+  const sc=SUBJ_COLOR[save.subject];
+  $('modes').innerHTML=MODES[save.subject][1].map(m=>{const b=save.best[m.id]||0;
+    return `<button class="mode" data-mode="${m.id}" style="--sc:${sc}"><span class="sym${m.cjk?' cjk':''}">${m.sym}</span><span class="nm">${m.nm}</span><span class="ex">${m.ex}</span><span class="st" aria-label="最佳 ${b} 顆星">${[1,2,3].map(i=>STAR.replace('class="star"',`class="star${i<=b?' on':''}"`)).join('')}</span></button>`;}).join('');
+  $('modes').querySelectorAll('.mode').forEach(b=>b.onclick=()=>start(b.dataset.mode));
+}
+document.querySelectorAll('.subj button').forEach(b=>b.onclick=()=>{save.subject=b.dataset.s;persist();renderHome();});
+
+function start(mode){S={mode,i:0,res:[],seen:new Set(),earned:0,first:0};show('play');next();}
+function next(){
+  if(S.i>=ROUND)return finish();
+  let q,tries=0;do{q=GEN[S.mode]();tries++;}while(S.seen.has(q.key)&&tries<40);S.seen.add(q.key);
+  q.opts=q.opts.map(o=>typeof o==='object'?o:{v:String(o),l:String(o)});
+  S.q=q;S.tries=0;S.lock=false;
+  $('qtext').textContent=q.text;
+  $('formula').className='formula'+(q.cjk?' cjk':'');$('formula').innerHTML=q.formula;$('formula').hidden=!q.formula;
+  $('visual').innerHTML=q.visual;$('visual').hidden=!q.visual;
+  $('hint').hidden=true;$('nextBtn').hidden=true;
+  const o=$('opts');o.className='opts'+(q.three?' three':'')+(q.one?' one':'');
+  const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  o.innerHTML=q.opts.map(x=>`<button class="opt${q.optStyle?' '+q.optStyle:''}" data-v="${esc(x.v)}">${esc(x.l)}</button>`).join('');
+  o.querySelectorAll('.opt').forEach(b=>b.onclick=()=>choose(b));
+  renderProg();say(q.speak);
+}
+function renderProg(){
+  $('prog').innerHTML=Array.from({length:ROUND},(_,i)=>{const r=S.res[i];const c=r==='first'||r==='later'?'':r==='miss'?'miss':'todo';return `<span class="${c}${i===S.i&&r===undefined?' now':''}">${ACORN}</span>`;}).join('');
+}
+function reveal(){
+  const a=S.q.ans;
+  if($('fq'))$('fq').textContent=a;if($('slot'))$('slot').textContent=a;
+}
+function choose(btn){
+  if(S.lock)return;const q=S.q;const v=btn.dataset.v;
+  if(String(q.ans)===v){
+    S.lock=true;btn.classList.add('right','pop');reveal();tone([660,880],.14);
+    S.res[S.i]=S.tries===0?'first':'later';if(S.tries===0)S.first++;S.earned++;
+    renderProg();say('答對了！');
+    setTimeout(()=>{S.i++;next();},S.tries===0?1000:1400);
+  }else{
+    S.tries++;btn.classList.add('wrong','shake');btn.disabled=true;tone([220],.22);
+    $('hint').textContent='提示：'+q.hint;$('hint').hidden=false;
+    if(S.tries>=2){
+      S.lock=true;reveal();
+      const lab=q.opts.find(x=>x.v===String(q.ans)).l;
+      $('opts').querySelectorAll('.opt').forEach(b=>{b.disabled=true;if(b.dataset.v===String(q.ans))b.classList.add('right');});
+      $('hint').textContent='答案是「'+lab+'」。'+q.hint;S.res[S.i]='miss';renderProg();$('nextBtn').hidden=false;
+      say('沒關係，答案是'+(q.ansSay||q.ans));
+    }else{say('再想想看，看一下提示。');}
+  }
+}
+$('nextBtn').onclick=()=>{S.i++;next();};
+$('speakBtn').onclick=()=>{if(!soundOn)setSound(true);say(S.q.speak);};
+$('backBtn').onclick=()=>{try{speechSynthesis.cancel();}catch(e){}renderHome();show('home');};
+
+function finish(){
+  const stars=S.first>=9?3:S.first>=6?2:1;
+  save.total+=S.earned;save.best[S.mode]=Math.max(save.best[S.mode]||0,stars);persist();
+  $('bankNum2').textContent=save.total;
+  $('resStars').innerHTML=[1,2,3].map(i=>STAR.replace('class="star"',`class="star pop${i<=stars?' on':''}" style="animation-delay:${i*.15}s"`)).join('');
+  const titles={3:'太厲害了！',2:'很棒喔！',1:'完成這一關了！'};
+  $('resTitle').textContent=titles[stars];
+  $('resText').innerHTML=`第一次就答對 <b class="num">${S.first}</b> 題，收集到 <b class="num">${S.earned}</b> 顆橡實。`+(stars<3?'<br>再玩一次，挑戰三顆星！':'');
+  tone(stars===3?[523,659,784,1047]:[523,659,784],.15);say(titles[stars]+'你收集到'+S.earned+'顆橡實。');
+  show('done');
+}
+$('againBtn').onclick=()=>start(S.mode);
+$('menuBtn').onclick=()=>{renderHome();show('home');};
+
+renderHome();show('home');
+})();
+</script>
+</body>
+</html>
