@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✏️</text></svg>">
+<title>小一闖關本</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Huninn&family=LXGW+WenKai+TC:wght@400;700&display=swap">
+<style>
+/* Layout: 作業簿 notebook. Grid-paper ground, each subject is a workbook cover with a white name label; play screens sit on a sheet of paper. Single light look on purpose. */
+:root{
+  --paper:#F4F7FB; --grid:#DFE7F1; --sheet:#FFFFFF; --ink:#1F2A44; --ink-2:#56627C; --line:#C9D4E3;
+  --math:#D9472F; --chin:#2C7A57; --nat:#E09A00; --eng:#3563C9;
+  --ok:#2E9E5B; --ok-bg:#E3F5EA; --bad:#C8402F; --bad-bg:#FBE6E2;
+  --star:#F2B705;
+  --f-ui:"Huninn","PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif;
+  --f-kai:"LXGW WenKai TC","BiauKai","DFKai-SB","標楷體","Kaiti TC",serif;
+  --f-abc:"Andika","Comic Sans MS","Arial Rounded MT Bold",sans-serif;
+  --r:14px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;
+  color:var(--ink);font-family:var(--f-ui);font-size:17px;line-height:1.55;
+  -webkit-tap-highlight-color:transparent;
+}
+.wrap{max-width:860px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:3px solid var(--eng);outline-offset:3px}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:400}
+
+/* top bar */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.brand h1{font-size:clamp(28px,6vw,40px);letter-spacing:.04em}
+.brand .home{color:var(--ink-2);font-size:15px;text-decoration:none;border-bottom:1.5px dashed var(--line)}
+.starbox{display:flex;align-items:center;gap:6px;background:var(--sheet);border:2px solid var(--ink);border-radius:999px;padding:4px 14px 4px 8px;font-variant-numeric:tabular-nums;font-size:18px;white-space:nowrap}
+.star{width:22px;height:22px;flex:none}
+.back{display:inline-flex;align-items:center;gap:6px;padding:8px 14px 8px 10px;border-radius:999px;background:var(--sheet);border:2px solid var(--ink);font-size:16px}
+
+/* workbook covers */
+.covers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+@media (max-width:560px){.covers{grid-template-columns:1fr}}
+.cover{position:relative;text-align:left;background:var(--c);color:#fff;border-radius:6px 16px 16px 6px;padding:20px 20px 18px 34px;min-height:200px;display:flex;flex-direction:column;gap:14px;box-shadow:0 3px 0 rgba(31,42,68,.25);transition:transform .15s}
+.cover::before{content:"";position:absolute;left:12px;top:0;bottom:0;width:6px;background:rgba(0,0,0,.16);border-radius:3px}
+.cover:hover{transform:translateY(-3px) rotate(-.4deg)}
+.cover .big{font-size:34px;letter-spacing:.08em;line-height:1.2}
+.cover .what{font-size:15px;opacity:.92}
+.label{margin-top:auto;background:#fff;color:var(--ink);border-radius:8px;padding:8px 12px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:15px}
+.label dt{color:var(--ink-2)}
+.label dd{margin:0;border-bottom:1.5px dashed var(--line);font-variant-numeric:tabular-nums}
+.math{--c:var(--math)}.chin{--c:var(--chin)}.nat{--c:var(--nat)}.eng{--c:var(--eng)}
+.nat .cover,.cover.nat{color:#2B1D00}
+
+.note{margin-top:28px;background:var(--sheet);border:1.5px solid var(--line);border-radius:var(--r);padding:14px 18px;font-size:14.5px;color:var(--ink-2);max-width:70ch}
+.note b{color:var(--ink);font-weight:400}
+.note a{color:var(--eng)}
+
+/* subject menu */
+.sheet{background:var(--sheet);border:2px solid var(--ink);border-radius:18px;padding:22px clamp(16px,4vw,32px);box-shadow:0 4px 0 rgba(31,42,68,.18)}
+.sheet-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.chip{display:inline-block;background:var(--c);color:#fff;border-radius:6px;padding:2px 10px;font-size:14px}
+.nat .chip{color:#2B1D00}
+.sheet h2{font-size:28px}
+.sub{color:var(--ink-2);margin:0 0 18px}
+.modes{display:grid;gap:12px}
+.mode{display:grid;grid-template-columns:56px 1fr auto;align-items:center;gap:14px;text-align:left;padding:14px 16px;border:2px solid var(--line);border-radius:var(--r);background:var(--sheet);transition:border-color .15s,transform .15s}
+.mode:hover{border-color:var(--c);transform:translateX(3px)}
+.mode .ico{width:56px;height:56px;border-radius:12px;background:var(--c);color:#fff;display:grid;place-items:center;font-size:28px;font-family:var(--f-kai)}
+.nat .mode .ico{color:#2B1D00}
+.mode h3{font-size:20px}
+.mode p{margin:0;color:var(--ink-2);font-size:14.5px}
+.mode .got{display:flex;gap:2px}
+.mode .got .star{width:20px;height:20px}
+
+/* question */
+.qbar{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.prog{flex:1;height:12px;border-radius:99px;background:var(--grid);overflow:hidden;border:1.5px solid var(--line)}
+.prog i{display:block;height:100%;background:var(--c);transition:width .3s}
+.qnum{font-variant-numeric:tabular-nums;color:var(--ink-2);font-size:15px;white-space:nowrap}
+.prompt{display:flex;align-items:flex-start;gap:10px;font-size:clamp(20px,4.6vw,26px);line-height:1.4;margin-bottom:12px}
+.prompt .t{flex:1;min-width:0}
+.say{flex:none;width:44px;height:44px;border-radius:50%;border:2px solid var(--ink);background:var(--sheet);display:grid;place-items:center}
+.say svg{width:22px;height:22px}
+.visual{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:12px;margin:6px 0 16px;min-height:40px}
+.bigchar{font-family:var(--f-kai);font-size:clamp(88px,22vw,128px);line-height:1;width:1.4em;height:1.4em;display:grid;place-items:center;position:relative}
+.tian{position:relative;background:#fff;border:2.5px solid var(--bad)}
+.tian::before,.tian::after{content:"";position:absolute;inset:0;pointer-events:none}
+.tian::before{background:linear-gradient(var(--bad),var(--bad)) center/100% 1.5px no-repeat,linear-gradient(var(--bad),var(--bad)) center/1.5px 100% no-repeat;opacity:.35}
+.emoji{font-size:clamp(72px,18vw,104px);line-height:1}
+.eq{font-size:clamp(40px,10vw,64px);font-variant-numeric:tabular-nums;letter-spacing:.04em;display:flex;align-items:center;gap:.25em;flex-wrap:wrap;justify-content:center}
+.eq .slot{min-width:1.6em;text-align:center;border-bottom:4px solid var(--ink);color:var(--c)}
+.abc{font-family:var(--f-abc);font-size:clamp(84px,22vw,120px);line-height:1}
+.word{font-family:var(--f-abc);font-size:clamp(36px,9vw,52px);letter-spacing:.06em}
+.word u{text-decoration:none;display:inline-block;min-width:.8em;border-bottom:4px solid var(--c);color:var(--c)}
+
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.opts.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:440px){.opts.three{grid-template-columns:1fr}}
+.opt{min-height:68px;border:2.5px solid var(--line);border-radius:var(--r);background:var(--sheet);font-size:22px;padding:10px;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;transition:border-color .12s,background .12s,transform .12s}
+.opt:hover:not(:disabled){border-color:var(--ink);transform:translateY(-2px)}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--ok-bg)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opt .kai{font-family:var(--f-kai);font-size:44px;line-height:1}
+.opt .rad{display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.opt .rad small{font-size:15px;color:var(--ink-2)}
+.opt .abc{font-size:52px}
+.opt svg.st{width:min(110px,100%);height:auto;aspect-ratio:1;max-width:100%}
+
+.keypad{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;max-width:520px;margin:0 auto}
+@media (max-width:440px){.keypad{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.key{min-height:60px;border-radius:12px;border:2.5px solid var(--line);background:var(--sheet);font-size:26px;font-variant-numeric:tabular-nums}
+.key:active{transform:scale(.96)}
+.key.go{background:var(--c);border-color:var(--c);color:#fff;grid-column:span 2;font-size:20px}
+.key.del{font-size:17px}
+
+.feedback{min-height:30px;margin-top:14px;font-size:19px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.feedback .m{min-width:0;flex:1}
+.feedback .yes{color:var(--ok)}
+.feedback .no{color:var(--bad)}
+.next{background:var(--ink);color:#fff;border-radius:999px;padding:10px 22px;font-size:18px}
+.hintbtn{border:2px dashed var(--line);border-radius:999px;padding:6px 14px;font-size:15px;color:var(--ink-2)}
+.blocks{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin:4px 0 10px}
+.bset{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:14px;color:var(--ink-2)}
+.bgrp{display:flex;align-items:flex-end;gap:4px;flex-wrap:wrap;max-width:260px;justify-content:center}
+.ten{width:10px;height:70px;background:repeating-linear-gradient(var(--c) 0 6px,#fff 6px 7px);border:1.5px solid var(--c);border-radius:2px}
+.ones{display:grid;grid-template-columns:repeat(5,10px);gap:2px}
+.one{width:10px;height:10px;background:var(--c);border-radius:2px;opacity:.75}
+
+/* writing */
+.charrow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.cchip{font-family:var(--f-kai);font-size:26px;width:46px;height:46px;border-radius:10px;border:2px solid var(--line);background:var(--sheet);position:relative}
+.cchip.on{border-color:var(--c);background:var(--c);color:#fff}
+.cchip.done::after{content:"";position:absolute;right:-5px;top:-5px;width:16px;height:16px;border-radius:50%;background:var(--ok);border:2px solid #fff}
+.writegrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:640px){.writegrid{grid-template-columns:1fr}}
+.board{position:relative;width:100%;max-width:340px;aspect-ratio:1;margin:0 auto;background:#fff;border:3px solid var(--bad);touch-action:none}
+.board svg.bg{position:absolute;inset:0;width:100%;height:100%}
+.board .hw{position:absolute;inset:0}
+.wbtns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.wbtn{border:2.5px solid var(--ink);border-radius:999px;padding:9px 18px;font-size:17px;background:var(--sheet)}
+.wbtn.pri{background:var(--c);border-color:var(--c);color:#fff}
+.side h3{font-size:22px;margin-bottom:4px}
+.side .count{color:var(--ink-2);margin:0 0 10px}
+.steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+.steps figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.steps svg{width:100%;max-width:72px;aspect-ratio:1;background:#fff;border:1.5px solid var(--line);border-radius:6px}
+.wmsg{min-height:28px;margin-top:12px;text-align:center;font-size:18px}
+
+/* result */
+.result{text-align:center;padding:10px 0}
+.result .stars{display:flex;justify-content:center;gap:10px;margin:14px 0}
+.result .stars .star{width:64px;height:64px}
+.result .stars .star.pop{animation:pop .5s cubic-bezier(.3,1.6,.5,1) both}
+.result .stars .star:nth-child(2){animation-delay:.15s}.result .stars .star:nth-child(3){animation-delay:.3s}
+@keyframes pop{from{transform:scale(.2) rotate(-30deg)}to{transform:none}}
+.result .score{font-size:22px;font-variant-numeric:tabular-nums}
+.result .btns{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:18px}
+.review{text-align:left;margin:18px auto 0;max-width:520px;font-size:15.5px;color:var(--ink-2)}
+.review li{margin:4px 0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="app"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.7.2/dist/hanzi-writer.min.js"></script>
+<script>
+const STROKES = {"一":{"strokes":["M 518 382 Q 572 385 623 389 Q 758 399 900 383 Q 928 379 935 390 Q 944 405 930 419 Q 896 452 845 475 Q 829 482 798 473 Q 723 460 480 434 Q 180 409 137 408 Q 130 408 124 408 Q 108 408 106 395 Q 105 380 127 363 Q 146 348 183 334 Q 195 330 216 338 Q 232 344 306 354 Q 400 373 518 382 Z"],"medians":[[[121,393],[193,372],[417,402],[827,434],[920,401]]],"radStrokes":null},"七":{"strokes":["M 433 375 Q 649 436 864 443 Q 889 443 895 453 Q 901 469 887 480 Q 812 531 750 510 Q 698 494 450 429 Q 441 428 434 424 L 387 414 Q 314 398 270 386 Q 204 367 103 353 Q 88 352 88 339 Q 89 326 111 313 Q 130 303 166 293 Q 179 290 196 301 Q 253 328 386 363 L 433 375 Z","M 386 363 Q 386 159 409 117 Q 445 69 575 64 Q 719 58 792 93 Q 805 102 804 113 Q 800 132 779 142 Q 749 157 729 154 Q 716 154 707 147 Q 680 125 543 118 Q 473 118 450 150 Q 426 189 433 375 L 434 424 Q 437 644 465 686 Q 481 714 452 734 Q 416 759 394 765 Q 363 772 354 758 Q 347 748 357 739 Q 391 705 388 630 Q 391 551 387 414 L 386 363 Z"],"medians":[[[101,340],[172,328],[492,417],[767,476],[820,476],[882,461]],[[364,750],[397,734],[424,701],[407,327],[414,194],[431,131],[477,103],[544,91],[658,97],[747,116],[784,112]]],"radStrokes":[0]},"三":{"strokes":["M 326 667 Q 283 663 312 640 Q 369 610 428 623 Q 543 641 665 661 Q 720 671 729 678 Q 739 688 735 698 Q 728 711 693 722 Q 660 731 561 701 Q 420 673 326 667 Z","M 329 421 Q 304 417 332 392 Q 348 379 385 383 Q 557 405 685 416 Q 721 420 709 440 Q 694 462 657 472 Q 621 479 558 466 Q 435 441 329 421 Z","M 130 165 Q 102 162 122 139 Q 140 120 163 113 Q 191 104 212 110 Q 515 179 929 157 Q 930 158 933 157 Q 960 156 967 167 Q 974 183 953 201 Q 884 255 835 246 Q 643 210 130 165 Z"],"medians":[[[316,655],[367,645],[416,648],[660,692],[722,692]],[[331,407],[375,405],[628,443],[657,443],[700,432]],[[127,152],[158,142],[195,139],[500,178],[846,204],[881,200],[955,174]]],"radStrokes":[0]},"上":{"strokes":["M 520 133 Q 523 296 525 442 L 525 479 Q 525 654 543 722 Q 556 746 540 761 Q 498 792 465 802 Q 449 805 432 791 Q 425 782 432 770 Q 462 727 462 629 Q 462 394 466 128 C 466 98 519 103 520 133 Z","M 525 442 Q 573 436 682 459 Q 769 477 776 484 Q 786 493 780 503 Q 771 516 738 523 Q 704 529 670 514 Q 637 502 601 493 Q 564 484 525 479 C 495 475 495 445 525 442 Z","M 528 82 Q 582 83 633 88 Q 781 100 911 81 Q 938 78 945 88 Q 954 103 940 116 Q 907 147 859 171 Q 843 178 813 169 Q 707 150 520 133 L 466 128 Q 363 121 309 114 Q 239 104 137 106 Q 121 106 120 93 Q 119 80 139 63 Q 184 30 234 41 Q 289 56 416 71 Q 468 78 528 82 Z"],"medians":[[[446,781],[462,775],[498,734],[493,159],[472,136]],[[531,448],[551,462],[627,473],[698,493],[768,496]],[[134,92],[171,76],[212,72],[458,103],[841,132],[932,99]]],"radStrokes":[2]},"下":{"strokes":["M 520 688 Q 758 710 827 705 Q 920 702 927 705 Q 927 706 929 707 Q 936 722 923 735 Q 848 801 781 778 Q 673 757 477 733 Q 173 697 130 695 Q 123 696 116 695 Q 101 695 100 683 Q 99 670 120 654 Q 138 641 172 629 Q 184 625 203 633 Q 219 640 294 653 Q 376 674 478 684 L 520 688 Z","M 544 524 Q 544 642 547 654 Q 551 667 541 675 Q 534 682 520 688 C 494 703 470 713 478 684 Q 499 648 485 268 Q 473 39 480 22 Q 486 6 498 -8 Q 511 -24 523 -5 Q 553 53 546 104 Q 540 161 544 492 L 544 524 Z","M 544 492 Q 620 446 712 378 Q 733 360 749 359 Q 759 359 765 371 Q 775 387 753 430 Q 723 493 544 524 C 514 529 518 508 544 492 Z"],"medians":[[[113,682],[145,669],[181,664],[440,706],[807,745],[870,736],[903,726],[924,710]],[[487,681],[516,656],[519,479],[510,-2]],[[555,519],[562,502],[645,466],[706,429],[729,407],[748,377]]],"radStrokes":[0]},"中":{"strokes":["M 254 596 Q 244 603 202 608 Q 189 611 185 605 Q 178 598 189 580 Q 228 507 254 384 Q 260 347 282 324 Q 303 300 307 318 Q 310 328 310 343 L 306 381 Q 305 390 303 399 Q 276 513 267 556 C 261 585 259 594 254 596 Z","M 752 425 Q 765 462 777 498 Q 793 546 828 578 Q 853 603 821 624 Q 793 648 762 666 Q 743 679 717 668 Q 677 655 615 646 Q 575 642 535 636 L 476 628 Q 427 622 380 613 Q 307 603 254 596 C 224 592 237 551 267 556 Q 274 556 286 559 Q 400 587 476 593 L 534 600 Q 604 609 698 615 Q 717 616 724 607 Q 739 583 693 435 C 684 406 742 397 752 425 Z","M 530 370 Q 630 380 764 386 Q 776 387 778 397 Q 779 406 752 425 C 730 441 723 440 693 435 Q 606 420 530 407 L 475 399 Q 385 389 306 381 C 276 378 280 341 310 343 Q 314 343 321 343 Q 382 356 475 365 L 530 370 Z","M 475 365 Q 472 17 485 -11 Q 486 -12 488 -16 Q 503 -32 512 -10 Q 530 32 530 370 L 530 407 Q 531 519 534 600 L 535 636 Q 538 742 559 778 Q 566 794 545 811 Q 520 830 475 843 Q 454 847 441 833 Q 431 826 444 812 Q 472 787 475 753 Q 475 704 476 628 L 476 593 Q 476 517 476 419 Q 475 409 475 399 L 475 365 Z"],"medians":[[[194,598],[229,572],[236,553],[295,323]],[[262,591],[281,579],[471,611],[719,641],[741,638],[777,596],[732,460],[702,446]],[[316,350],[330,365],[689,409],[749,405],[768,398]],[[449,823],[476,817],[513,781],[505,656],[499,-10]]],"radStrokes":[3]},"九":{"strokes":["M 388 486 Q 319 225 74 56 Q 59 44 74 41 Q 92 42 133 60 Q 217 103 278 166 Q 348 230 380 303 Q 438 441 451 505 L 456 539 Q 456 593 481 702 Q 487 733 500 762 Q 510 784 490 795 Q 430 835 398 823 Q 382 817 390 799 Q 411 762 412 689 Q 402 550 396 523 L 388 486 Z","M 451 505 Q 520 527 570 535 Q 592 539 598 534 Q 602 527 598 511 Q 490 112 639 36 Q 676 18 741 10 Q 877 -3 968 54 Q 989 66 980 90 Q 961 156 954 255 Q 953 274 946 273 Q 940 273 935 254 Q 925 212 913 164 Q 903 127 879 104 Q 860 86 800 80 Q 733 70 679 89 Q 631 104 616 136 Q 594 173 602 259 Q 612 350 654 464 Q 673 512 702 538 Q 718 551 717 564 Q 716 576 646 607 Q 631 617 613 602 Q 568 572 456 539 L 396 523 Q 335 510 278 493 Q 232 483 156 482 Q 141 483 144 467 Q 147 455 174 439 Q 205 421 243 437 Q 321 465 388 486 L 451 505 Z"],"medians":[[[402,808],[428,792],[451,765],[424,515],[412,464],[374,360],[330,274],[266,191],[170,103],[78,49]],[[153,472],[190,458],[227,459],[587,561],[638,560],[646,551],[639,520],[618,464],[589,349],[576,202],[589,136],[603,107],[642,70],[679,55],[736,43],[801,43],[872,55],[917,78],[932,98],[946,267]]],"radStrokes":[1]},"二":{"strokes":["M 308 603 Q 260 597 293 574 Q 339 544 436 558 Q 551 576 673 596 Q 731 608 741 615 Q 753 625 747 636 Q 738 652 702 663 Q 669 672 559 641 Q 424 610 308 603 Z","M 517 212 Q 569 213 620 219 Q 756 229 896 214 Q 921 210 929 220 Q 938 235 924 248 Q 891 279 842 302 Q 826 309 797 301 Q 728 286 481 261 Q 172 236 155 234 Q 142 234 128 234 Q 113 234 111 221 Q 110 208 131 191 Q 150 176 185 163 Q 197 159 217 167 Q 233 173 306 183 Q 400 202 517 212 Z"],"medians":[[[293,587],[386,581],[688,633],[733,629]],[[126,219],[195,200],[469,236],[823,263],[916,230]]],"radStrokes":null},"人":{"strokes":["M 475 485 Q 547 653 563 683 Q 573 695 565 708 Q 558 721 519 742 Q 491 757 480 754 Q 462 750 465 730 Q 484 537 292 308 Q 280 296 269 284 Q 212 217 68 102 Q 58 92 66 89 Q 76 86 90 92 Q 190 138 274 210 Q 380 294 462 456 L 475 485 Z","M 462 456 Q 480 423 575 292 Q 666 171 733 101 Q 764 67 793 69 Q 881 75 958 79 Q 991 80 992 89 Q 993 98 956 112 Q 772 178 740 205 Q 617 304 490 466 Q 481 476 475 485 C 457 509 447 482 462 456 Z"],"medians":[[[483,736],[508,702],[511,678],[473,552],[408,416],[328,303],[271,244],[144,139],[72,95]],[[474,477],[477,459],[490,439],[571,333],[691,200],[753,145],[798,119],[986,90]]],"radStrokes":null},"入":{"strokes":["M 499 518 Q 414 338 228 186 Q 180 147 112 96 Q 99 83 109 81 Q 118 77 132 82 Q 282 139 428 311 Q 528 444 534 455 C 551 480 512 545 499 518 Z","M 534 455 Q 691 137 740 111 Q 782 98 945 83 Q 966 79 977 84 Q 989 90 980 97 Q 973 104 956 110 Q 775 198 729 244 Q 645 328 554 498 Q 479 642 432 671 Q 396 693 358 690 Q 348 691 341 688 Q 337 685 338 681 Q 338 678 398 647 Q 437 626 493 528 Q 496 524 499 518 L 534 455 Z"],"medians":[[[499,510],[499,455],[403,320],[273,191],[191,131],[115,88]],[[342,683],[416,659],[466,608],[512,537],[580,405],[638,308],[732,184],[763,157],[780,150],[970,92]]],"radStrokes":null},"八":{"strokes":["M 317 465 Q 318 338 155 190 Q 136 178 79 126 Q 67 110 85 113 Q 110 114 146 137 Q 258 209 325 305 Q 368 363 406 409 Q 419 422 404 441 Q 355 486 329 484 Q 316 483 317 465 Z","M 446 687 Q 507 636 530 577 Q 608 343 711 190 Q 732 163 846 151 Q 892 147 958 141 Q 983 140 984 146 Q 984 152 963 163 Q 756 269 675 396 Q 621 480 551 644 Q 530 690 483 702 Q 449 709 445 702 Q 438 692 446 687 Z"],"medians":[[[331,470],[358,421],[291,303],[204,206],[143,156],[89,123]],[[452,695],[484,681],[525,640],[645,378],[693,302],[755,227],[839,190],[978,147]]],"radStrokes":null},"力":{"strokes":["M 521 525 Q 600 540 679 548 Q 704 549 709 537 Q 718 518 712 470 Q 693 293 656 200 Q 637 142 617 124 Q 604 111 576 120 Q 539 132 505 144 Q 480 151 497 129 Q 546 74 573 33 Q 583 9 606 16 Q 628 17 654 47 Q 732 122 767 421 Q 774 488 801 526 Q 820 551 810 563 Q 792 585 751 603 Q 723 619 691 605 Q 621 580 527 561 L 468 550 Q 303 531 241 532 Q 216 536 216 522 Q 215 510 240 492 Q 271 468 303 478 Q 382 499 461 514 L 521 525 Z","M 461 514 Q 392 231 161 88 Q 142 75 123 60 Q 107 48 123 46 Q 139 45 182 62 Q 267 101 330 161 Q 402 224 449 318 Q 507 445 521 525 L 527 561 Q 558 717 573 745 Q 585 767 565 778 Q 507 820 474 810 Q 458 804 466 786 Q 496 723 468 550 L 461 514 Z"],"medians":[[[228,521],[269,505],[303,506],[709,577],[724,574],[757,546],[720,306],[689,188],[654,109],[627,80],[604,71],[498,138]],[[478,795],[511,768],[524,742],[490,513],[468,435],[436,355],[382,260],[319,184],[244,120],[127,53]]],"radStrokes":null},"十":{"strokes":["M 541 450 Q 754 474 901 462 Q 935 462 940 467 Q 949 482 935 494 Q 862 560 793 538 Q 745 529 542 499 L 482 492 Q 355 479 290 469 Q 218 457 112 455 Q 97 455 96 443 Q 95 430 116 414 Q 134 401 168 388 Q 180 384 199 393 Q 215 399 292 413 Q 377 434 482 444 L 541 450 Z","M 482 444 Q 482 240 478 171 Q 475 -6 495 -40 Q 511 -56 521 -34 Q 539 21 540 425 Q 540 438 541 450 L 542 499 Q 543 722 569 763 Q 576 781 555 798 Q 528 819 482 830 Q 461 836 447 821 Q 437 812 450 799 Q 480 774 482 739 Q 482 651 482 492 L 482 444 Z"],"medians":[[[109,442],[177,422],[373,456],[819,505],[869,499],[932,476]],[[456,811],[484,803],[522,767],[512,593],[507,-33]]],"radStrokes":null},"口":{"strokes":["M 295 571 Q 267 590 236 597 Q 227 600 221 594 Q 211 587 223 573 Q 281 477 292 248 Q 293 176 338 142 Q 339 141 343 139 Q 365 133 365 170 Q 365 174 365 177 L 360 223 Q 327 406 322 528 C 321 555 320 555 295 571 Z","M 719 261 Q 755 472 821 538 Q 845 563 824 589 Q 802 607 729 642 Q 704 652 674 641 Q 515 587 295 571 C 265 569 293 522 322 528 Q 331 529 345 533 Q 493 555 634 577 Q 671 584 685 568 Q 707 549 703 505 Q 684 372 654 268 C 646 239 714 231 719 261 Z","M 365 177 Q 372 177 383 178 Q 495 200 738 212 Q 751 213 754 224 Q 755 234 719 261 C 698 277 683 274 654 268 Q 491 235 360 223 C 330 220 335 176 365 177 Z"],"medians":[[[229,584],[272,548],[287,517],[330,203],[348,152]],[[304,569],[333,552],[488,574],[663,608],[700,607],[720,598],[759,559],[758,552],[694,295],[661,273]],[[369,185],[394,203],[651,238],[710,236],[744,224]]],"radStrokes":null},"土":{"strokes":["M 535 428 Q 602 441 673 451 Q 739 464 749 472 Q 759 481 755 490 Q 748 505 715 514 Q 681 523 647 511 Q 592 495 537 481 L 483 470 Q 395 454 293 449 Q 251 445 280 424 Q 320 397 409 409 Q 445 415 483 420 L 535 428 Z","M 521 151 Q 528 293 535 428 L 537 481 Q 538 595 566 720 Q 570 733 546 751 Q 504 773 475 779 Q 456 783 446 773 Q 436 763 447 746 Q 481 694 481 658 Q 484 567 483 470 L 483 420 Q 480 290 471 145 C 469 115 520 121 521 151 Z","M 471 145 Q 314 130 132 111 Q 107 110 125 87 Q 162 50 211 60 Q 452 121 842 114 Q 875 113 903 112 Q 928 111 935 122 Q 942 137 922 154 Q 847 212 795 192 Q 689 176 521 151 L 471 145 Z"],"medians":[[[283,438],[312,430],[379,430],[486,445],[692,487],[741,485]],[[461,760],[517,714],[518,685],[498,173],[476,153]],[[129,99],[188,87],[378,115],[818,156],[866,149],[922,129]]],"radStrokes":null},"大":{"strokes":["M 494 476 Q 542 485 795 501 Q 817 502 822 512 Q 826 525 808 540 Q 750 580 707 569 Q 631 550 500 522 L 436 509 Q 331 490 213 469 Q 189 465 208 447 Q 241 420 294 432 Q 357 453 431 465 L 494 476 Z","M 487 437 Q 491 456 494 476 L 500 522 Q 510 711 528 763 Q 534 776 523 786 Q 501 805 459 822 Q 434 832 414 825 Q 390 816 410 796 Q 444 762 444 726 Q 445 602 436 509 L 431 465 Q 398 275 310 179 Q 303 173 297 166 Q 251 118 148 55 Q 133 48 130 43 Q 124 36 144 34 Q 195 34 300 104 Q 385 173 414 218 Q 444 266 480 396 L 487 437 Z","M 480 396 Q 501 357 575 245 Q 657 124 718 56 Q 746 22 774 22 Q 856 28 928 32 Q 959 33 959 41 Q 960 50 927 66 Q 753 144 719 174 Q 614 267 500 419 Q 493 429 487 437 C 469 461 465 422 480 396 Z"],"medians":[[[210,458],[268,453],[514,503],[719,534],[770,529],[810,517]],[[416,810],[444,799],[482,759],[469,518],[448,394],[426,320],[386,231],[361,196],[307,140],[202,67],[138,41]],[[486,430],[500,393],[576,284],[660,182],[722,118],[774,77],[953,42]]],"radStrokes":null},"天":{"strokes":["M 499 681 Q 581 697 671 713 Q 726 725 734 732 Q 744 741 739 750 Q 732 763 699 773 Q 666 780 562 747 Q 439 719 336 709 Q 294 703 324 684 Q 369 659 430 668 L 499 681 Z","M 509 439 Q 615 454 771 455 Q 843 455 848 465 Q 854 478 836 493 Q 781 532 739 524 Q 652 505 506 478 L 447 470 Q 323 452 181 432 Q 159 429 175 411 Q 208 381 250 391 Q 340 416 442 430 L 509 439 Z","M 506 478 Q 512 583 534 637 Q 540 650 530 658 Q 518 670 499 681 C 474 698 413 693 430 668 Q 455 637 455 606 Q 454 531 447 470 L 442 430 Q 412 253 320 176 Q 232 113 145 75 Q 130 71 127 66 Q 121 60 138 57 Q 214 51 362 143 Q 390 167 413 194 Q 470 267 494 405 L 506 478 Z","M 494 405 Q 629 144 722 51 Q 740 33 762 31 Q 847 30 920 27 Q 951 26 952 33 Q 953 42 920 59 Q 752 134 710 180 Q 601 294 515 430 Q 511 434 509 439 C 493 464 473 446 494 405 Z"],"medians":[[[326,698],[350,691],[403,691],[654,741],[700,747],[727,744]],[[179,421],[204,414],[238,414],[519,462],[749,490],[800,484],[839,472]],[[438,664],[485,643],[491,633],[466,401],[450,336],[424,268],[394,216],[340,158],[212,87],[134,63]],[[505,431],[510,408],[533,366],[596,270],[714,122],[771,78],[947,35]]],"radStrokes":[1,2,3]},"女":{"strokes":["M 445 467 Q 485 576 514 665 Q 526 705 540 732 Q 562 757 524 789 Q 478 825 449 826 Q 433 827 429 815 Q 425 806 434 798 Q 455 774 453 731 Q 441 625 390 461 L 375 416 Q 348 338 337 327 Q 313 309 331 280 Q 340 270 356 274 Q 393 283 491 221 L 535 192 Q 637 132 757 11 Q 776 -8 789 -7 Q 805 -6 805 17 Q 804 54 773 100 Q 755 127 701 153 Q 599 213 569 230 L 519 256 Q 395 320 393 327 Q 393 333 427 423 L 445 467 Z","M 695 496 Q 656 544 628 541 Q 612 540 614 522 Q 618 504 617 486 L 606 440 Q 566 319 519 256 L 491 221 Q 406 128 277 81 Q 256 74 237 65 Q 221 59 233 53 Q 248 49 289 53 Q 356 63 413 95 Q 473 122 535 192 L 569 230 Q 600 275 659 395 Q 669 423 688 447 C 705 472 710 479 695 496 Z","M 688 447 Q 757 456 931 443 Q 956 440 962 449 Q 969 462 957 475 Q 926 503 881 524 Q 866 531 839 522 Q 767 507 695 496 L 617 486 Q 461 471 445 467 L 390 461 Q 314 454 268 447 Q 189 435 73 434 Q 60 434 57 422 Q 57 409 76 394 Q 94 381 126 369 Q 138 365 156 373 Q 205 392 375 416 L 427 423 Q 448 426 606 440 L 688 447 Z"],"medians":[[[442,810],[475,787],[498,746],[453,573],[373,346],[365,309],[498,244],[675,132],[740,81],[787,11]],[[628,527],[652,492],[651,462],[587,314],[549,249],[520,214],[452,148],[384,105],[321,78],[238,58]],[[70,420],[138,402],[383,440],[857,487],[913,474],[950,458]]],"radStrokes":null},"子":{"strokes":["M 544 561 Q 575 580 648 638 Q 679 666 700 671 Q 737 683 739 698 Q 740 708 705 746 Q 672 782 661 780 Q 657 783 644 778 Q 575 748 344 719 Q 323 720 309 722 Q 290 726 283 715 Q 280 708 288 697 Q 298 684 322 666 Q 343 650 354 650 Q 364 649 384 662 Q 420 690 607 732 Q 632 738 637 735 Q 643 731 642 723 Q 642 714 543 589 Q 534 580 529 573 C 509 550 519 545 544 561 Z","M 529 573 Q 505 588 486 592 Q 474 596 466 591 Q 462 587 474 574 Q 495 544 508 451 L 513 407 Q 541 169 492 90 Q 489 83 482 81 Q 467 77 356 100 Q 349 100 346 97 Q 345 93 354 85 Q 429 30 470 -13 Q 483 -26 492 -24 Q 505 -23 527 -1 Q 575 44 576 136 Q 583 239 562 411 L 557 457 Q 551 505 549 542 Q 549 554 544 561 L 529 573 Z","M 508 451 Q 499 452 299 429 Q 227 419 121 418 Q 108 418 106 406 Q 105 393 124 378 Q 142 365 174 353 Q 186 349 204 357 Q 222 363 297 375 Q 393 397 513 407 L 562 411 Q 769 430 888 417 Q 937 417 940 418 Q 940 421 942 421 Q 949 434 937 447 Q 864 513 800 491 Q 739 479 675 469 Q 605 463 557 457 L 508 451 Z"],"medians":[[[294,711],[355,686],[462,717],[620,752],[658,752],[675,732],[681,708],[549,578],[536,574]],[[472,588],[516,549],[530,478],[550,263],[549,179],[537,99],[523,64],[505,42],[490,34],[383,79],[368,91],[353,93]],[[119,405],[142,394],[186,386],[410,420],[826,459],[855,457],[916,439],[937,422]]],"radStrokes":null},"小":{"strokes":["M 499 695 Q 503 661 501 132 Q 500 110 488 101 Q 478 92 448 100 Q 414 107 383 113 Q 347 123 351 112 Q 352 105 375 91 Q 456 42 479 10 Q 504 -26 523 -25 Q 538 -26 552 11 Q 568 57 564 133 Q 531 583 572 723 Q 590 754 532 778 Q 498 797 477 789 Q 459 782 475 759 Q 497 731 499 695 Z","M 266 475 Q 223 408 170 349 Q 160 339 155 320 Q 148 292 154 273 Q 158 251 185 261 Q 213 274 237 308 Q 273 357 284 404 Q 297 441 293 470 Q 289 480 283 484 Q 273 484 266 475 Z","M 706 472 Q 769 411 842 323 Q 860 299 878 293 Q 888 292 897 303 Q 913 318 900 370 Q 887 431 709 508 Q 699 515 696 500 Q 695 484 706 472 Z"],"medians":[[[484,773],[501,765],[533,730],[525,545],[532,191],[528,90],[510,54],[459,68],[358,112]],[[280,476],[254,405],[170,274]],[[709,494],[800,425],[848,380],[866,353],[879,311]]],"radStrokes":null},"山":{"strokes":["M 536 209 Q 546 407 552 587 Q 556 633 562 664 Q 569 691 574 710 Q 578 723 554 740 Q 512 762 484 767 Q 465 771 456 760 Q 447 751 457 734 Q 488 688 489 655 Q 499 444 488 200 C 487 170 534 179 536 209 Z","M 796 244 Q 657 232 536 209 L 488 200 Q 379 182 284 155 Q 256 148 263 180 Q 267 253 272 329 Q 275 357 263 373 Q 220 416 190 409 Q 178 403 188 382 Q 224 309 215 236 Q 211 166 182 133 Q 161 112 170 96 Q 183 78 203 66 Q 219 57 230 67 Q 243 83 283 99 Q 440 151 606 182 Q 757 210 789 197 C 819 193 826 247 796 244 Z","M 789 197 Q 783 166 774 145 Q 756 118 785 55 Q 795 36 809 49 Q 837 73 846 173 Q 868 386 890 427 Q 900 443 889 460 Q 867 479 831 501 Q 816 510 802 503 Q 793 499 796 484 Q 823 435 796 244 L 789 197 Z"],"medians":[[[472,748],[525,700],[514,235],[493,208]],[[196,398],[217,379],[239,340],[243,263],[233,126],[282,127],[380,155],[575,197],[710,218],[772,221],[788,237]],[[810,490],[826,477],[849,433],[798,57]]],"radStrokes":null},"手":{"strokes":["M 502 718 Q 550 731 590 746 Q 641 759 683 764 Q 701 763 706 771 Q 710 781 700 795 Q 679 814 634 837 Q 619 847 605 847 Q 596 844 594 832 Q 591 802 411 730 Q 365 714 310 696 Q 303 687 310 684 Q 328 678 449 707 Q 458 708 468 711 L 502 718 Z","M 555 563 Q 697 591 706 599 Q 716 606 711 616 Q 704 628 674 636 Q 644 643 547 611 L 506 600 Q 496 599 486 596 Q 413 580 327 574 Q 290 568 315 550 Q 358 528 428 540 Q 468 549 513 554 L 555 563 Z","M 575 389 Q 687 398 843 397 Q 927 394 935 406 Q 942 419 923 436 Q 863 479 820 471 Q 723 452 571 429 L 525 422 Q 513 422 503 420 Q 325 398 115 373 Q 90 372 108 351 Q 124 335 145 329 Q 169 322 187 328 Q 352 373 527 385 L 575 389 Z","M 527 385 Q 536 154 492 78 Q 488 69 479 66 Q 467 62 376 87 Q 369 88 366 85 Q 365 81 373 73 Q 437 19 470 -22 Q 482 -35 489 -33 Q 505 -32 532 -3 Q 590 57 589 171 Q 590 237 575 389 L 571 429 Q 562 519 555 563 L 547 611 Q 541 650 540 680 Q 540 699 528 706 Q 515 713 502 718 C 475 730 454 737 468 711 Q 486 687 506 600 L 513 554 Q 520 493 525 422 L 527 385 Z"],"medians":[[[696,777],[623,796],[504,743],[388,705],[314,690]],[[319,563],[387,557],[515,578],[654,611],[700,610]],[[111,362],[168,352],[395,390],[830,435],[869,430],[926,412]],[[474,710],[512,683],[538,532],[557,281],[556,186],[548,115],[520,46],[492,22],[372,81]]],"radStrokes":null},"文":{"strokes":["M 420 777 Q 448 753 480 724 Q 498 708 517 710 Q 530 711 536 728 Q 540 747 528 783 Q 521 805 485 819 Q 400 846 384 836 Q 378 830 380 815 Q 386 802 420 777 Z","M 528 568 Q 553 574 753 603 Q 766 602 776 616 Q 777 631 751 643 Q 709 670 625 641 Q 424 593 256 571 Q 225 568 193 562 Q 159 558 185 537 Q 224 507 258 515 Q 364 539 496 563 L 528 568 Z","M 507 261 Q 553 339 576 447 Q 582 480 591 501 Q 598 514 588 525 Q 558 561 528 568 C 500 579 493 582 496 563 Q 495 560 496 555 Q 526 444 468 318 Q 464 311 461 302 L 442 267 Q 385 183 252 131 Q 204 115 137 95 Q 125 94 120 90 Q 113 86 123 79 Q 130 76 146 78 Q 261 85 347 123 Q 414 150 482 225 L 507 261 Z","M 482 225 Q 525 164 676 38 Q 698 16 734 16 Q 842 17 928 32 Q 974 39 970 51 Q 969 58 922 69 Q 732 114 678 141 Q 612 172 507 261 L 461 302 Q 415 345 368 394 Q 326 437 288 437 Q 269 437 265 432 Q 264 425 280 412 Q 331 384 442 267 L 482 225 Z"],"medians":[[[390,828],[485,774],[514,732]],[[187,550],[230,541],[259,543],[678,624],[725,626],[764,618]],[[502,559],[532,534],[544,515],[543,462],[513,344],[491,294],[456,237],[388,174],[331,141],[250,110],[154,87],[126,86]],[[271,429],[336,398],[561,179],[697,81],[729,67],[789,59],[964,49]]],"radStrokes":null},"日":{"strokes":["M 349 664 Q 348 665 347 666 Q 322 687 292 696 Q 282 697 274 689 Q 270 682 279 670 Q 331 531 294 261 Q 287 216 271 169 Q 262 141 267 118 Q 277 81 291 65 Q 304 50 314 66 Q 324 79 332 102 L 339 137 Q 349 186 350 238 Q 350 316 351 391 L 352 420 Q 353 576 361 626 C 364 652 364 652 349 664 Z","M 608 120 Q 641 78 665 39 Q 675 18 688 19 Q 707 20 724 59 Q 745 104 740 157 Q 728 310 721 593 Q 720 629 738 654 Q 748 669 738 681 Q 716 703 656 730 Q 635 740 617 729 Q 512 684 349 664 C 319 660 332 620 361 626 Q 410 635 590 672 Q 624 679 640 666 Q 691 615 658 164 Q 657 163 657 159 Q 653 143 640 144 C 621 121 602 128 608 120 Z","M 351 391 Q 390 378 433 387 Q 493 399 554 411 Q 582 417 587 421 Q 596 428 591 437 Q 584 447 556 455 Q 531 461 450 435 Q 375 423 352 420 C 322 416 322 400 351 391 Z","M 332 102 Q 345 98 361 100 Q 440 115 608 120 C 638 121 661 122 640 144 Q 633 153 614 166 Q 596 178 561 170 Q 438 146 339 137 C 309 134 303 108 332 102 Z"],"medians":[[[284,684],[321,646],[328,617],[332,516],[323,261],[302,136],[302,70]],[[359,660],[374,648],[388,650],[635,703],[668,687],[690,665],[699,450],[699,159],[685,105],[688,37]],[[357,413],[369,404],[398,404],[534,432],[581,431]],[[340,106],[355,119],[432,130],[585,147],[632,143]]],"radStrokes":null},"月":{"strokes":["M 398 390 Q 410 502 412 535 L 414 566 Q 417 717 420 735 C 422 758 422 758 405 766 Q 405 767 404 767 Q 353 791 337 787 Q 316 783 334 760 Q 373 697 357 455 Q 353 356 304 239 Q 271 154 155 37 Q 140 24 137 16 Q 136 9 148 10 Q 164 11 186 26 Q 246 69 281 112 Q 333 173 363 244 Q 382 296 394 361 L 398 390 Z","M 420 735 Q 429 735 609 769 Q 631 773 637 762 Q 656 713 657 390 Q 657 128 640 101 Q 634 94 612 99 Q 581 105 549 111 Q 527 117 528 107 Q 595 55 633 16 Q 649 -3 665 -9 Q 675 -13 685 -2 Q 730 53 725 113 Q 712 321 709 657 Q 708 721 723 750 Q 736 772 723 783 Q 698 804 658 820 Q 639 827 621 820 Q 569 793 536 785 Q 493 773 405 766 C 375 763 390 730 420 735 Z","M 412 535 Q 442 529 533 542 Q 587 551 594 554 Q 603 561 599 569 Q 592 579 566 587 Q 538 594 511 583 Q 487 576 462 572 Q 440 568 414 566 C 384 564 382 540 412 535 Z","M 394 361 Q 428 351 561 374 Q 564 375 568 375 Q 590 379 594 382 Q 603 389 599 397 Q 592 407 566 415 Q 538 421 511 411 Q 484 404 456 397 Q 428 393 398 390 C 368 387 365 368 394 361 Z"],"medians":[[[339,773],[379,742],[387,685],[385,504],[366,342],[341,259],[296,169],[236,93],[184,43],[145,17]],[[415,764],[429,752],[503,762],[634,796],[666,780],[681,758],[687,291],[683,93],[664,56],[632,63],[538,104]],[[417,542],[430,550],[535,566],[588,564]],[[399,368],[413,375],[535,394],[588,392]]],"radStrokes":null},"木":{"strokes":["M 524 533 Q 537 536 755 560 Q 768 557 779 573 Q 780 586 754 600 Q 709 627 634 603 Q 526 582 524 580 L 479 572 Q 404 563 234 546 Q 200 542 226 521 Q 265 491 291 494 Q 309 503 446 521 L 524 533 Z","M 524 580 Q 524 682 544 758 Q 559 783 532 802 Q 516 814 485 833 Q 460 851 439 834 Q 433 828 440 813 Q 474 762 476 711 Q 477 647 479 572 L 477 458 Q 474 208 466 155 Q 442 46 456 5 Q 460 -7 466 -21 Q 473 -40 481 -43 Q 488 -50 495 -41 Q 504 -37 514 -15 Q 524 10 523 44 Q 522 90 523 480 L 524 580 Z","M 446 521 Q 368 337 127 132 Q 114 119 124 117 Q 134 113 146 119 Q 276 176 403 344 Q 472 450 477 458 C 528 538 464 563 446 521 Z","M 523 480 Q 607 338 716 186 Q 737 159 774 157 Q 901 147 942 150 Q 954 151 957 157 Q 957 164 941 173 Q 773 251 721 302 Q 628 398 523 532 Q 523 533 524 533 L 524 533 C 506 558 508 506 523 480 Z"],"medians":[[[228,534],[280,522],[695,584],[728,584],[766,574]],[[453,825],[506,771],[498,218],[486,-29]],[[474,519],[459,504],[447,460],[404,389],[332,297],[244,206],[179,154],[130,124]],[[528,513],[549,470],[641,344],[749,220],[789,200],[951,159]]],"radStrokes":null},"林":{"strokes":["M 326 494 Q 431 521 435 525 Q 444 532 439 541 Q 432 551 404 559 Q 362 565 328 545 L 283 531 Q 178 507 117 500 Q 81 494 107 478 Q 144 457 226 474 Q 244 478 265 481 L 326 494 Z","M 324 419 Q 324 455 326 494 L 328 545 Q 328 654 349 726 Q 364 751 334 771 Q 319 783 294 797 Q 272 815 251 799 Q 247 795 252 779 Q 282 734 283 661 Q 283 597 283 531 L 279 401 Q 270 212 270 210 Q 263 170 251 129 Q 239 86 265 30 Q 271 12 279 9 Q 285 2 292 10 Q 320 34 319 90 Q 318 127 323 393 L 324 419 Z","M 265 481 Q 210 346 58 149 Q 54 139 64 138 Q 88 138 193 265 Q 239 320 279 401 C 332 506 277 509 265 481 Z","M 323 393 Q 378 338 399 336 Q 411 336 416 353 Q 417 365 407 383 Q 397 398 374 405 Q 340 418 324 419 C 294 422 302 414 323 393 Z","M 659 526 Q 834 574 840 577 Q 849 587 844 595 Q 835 608 804 614 Q 771 620 739 606 Q 699 591 659 577 L 613 563 Q 553 550 489 540 Q 450 533 479 515 Q 524 491 587 509 Q 590 510 598 511 L 659 526 Z","M 658 483 Q 658 505 659 526 L 659 577 Q 659 688 680 761 Q 693 788 668 806 Q 652 818 621 837 Q 596 855 575 838 Q 569 834 576 817 Q 610 768 611 716 Q 612 646 613 563 L 611 432 Q 608 204 593 136 Q 572 49 592 7 Q 593 0 598 -9 Q 605 -28 613 -31 Q 620 -38 628 -29 Q 635 -25 646 -3 Q 656 22 656 56 Q 655 101 657 437 L 658 483 Z","M 598 511 Q 570 444 532 383 Q 487 313 383 185 Q 377 175 388 174 Q 394 173 403 181 Q 530 283 611 432 C 667 533 610 539 598 511 Z","M 657 437 Q 718 332 797 220 Q 813 199 844 198 Q 947 195 981 199 Q 991 200 992 205 Q 993 209 980 218 Q 829 296 770 360 Q 716 415 658 483 C 638 506 642 463 657 437 Z"],"medians":[[[109,490],[150,485],[193,490],[333,519],[369,533],[429,535]],[[263,792],[289,770],[312,739],[298,259],[283,104],[284,23]],[[279,478],[271,472],[255,404],[211,327],[141,228],[65,146]],[[328,412],[342,396],[385,371],[399,351]],[[481,529],[504,524],[557,526],[667,552],[765,585],[822,591],[835,586]],[[589,829],[642,775],[634,321],[619,-17]],[[606,508],[588,435],[540,356],[456,249],[390,182]],[[661,475],[674,439],[718,380],[829,253],[856,239],[985,205]]],"radStrokes":[0,1,2,3]}};
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const app = $('#app');
+const rnd = n => Math.floor(Math.random()*n);
+const pick = a => a[rnd(a.length)];
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];} return a; };
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const STAR = (on=true) => `<svg class="star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 6 6.5.8-4.8 4.5 1.2 6.5L12 17.3 6.2 20.4l1.2-6.5L2.6 9.4l6.5-.8z" fill="${on?'var(--star)':'none'}" stroke="${on?'#B98A00':'var(--line)'}" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+const SPK = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="var(--ink)"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/></svg>`;
+const BACK = `<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+/* saved progress (this browser only) */
+const KEY='xiaoyi-v1';
+let save = {best:{}, written:{}};
+try{ const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.best) save=Object.assign({best:{},written:{}},s);}catch(e){}
+function persist(){ try{localStorage.setItem(KEY,JSON.stringify(save));}catch(e){} }
+function totalStars(){ return Object.values(save.best).reduce((a,b)=>a+b,0) + Object.keys(save.written).length; }
+
+/* speech */
+function speak(text, lang='zh-TW'){
+  try{
+    if(!('speechSynthesis' in window)) return false;
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text); u.lang=lang; u.rate=lang==='zh-TW'?0.9:0.8;
+    const v=speechSynthesis.getVoices().find(v=>v.lang.replace('_','-')===lang)||speechSynthesis.getVoices().find(v=>v.lang.startsWith(lang.slice(0,2)));
+    if(v) u.voice=v;
+    speechSynthesis.speak(u); return true;
+  }catch(e){return false;}
+}
+try{ speechSynthesis && speechSynthesis.getVoices(); }catch(e){}
+
+/* sound */
+let ac=null;
+function beep(good){
+  try{
+    ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+    const notes = good?[660,880]:[300,220];
+    notes.forEach((f,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;
+      g.gain.setValueAtTime(.0001,ac.currentTime+i*.12);g.gain.exponentialRampToValueAtTime(.18,ac.currentTime+i*.12+.02);
+      g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+i*.12+.2);o.connect(g).connect(ac.destination);o.start(ac.currentTime+i*.12);o.stop(ac.currentTime+i*.12+.22);});
+  }catch(e){}
+}
+
+/* stroke svg (data: Make Me a Hanzi via hanzi-writer-data) */
+function strokeSVG(ch, {upto=null, mark=null, cls='st'}={}){
+  const d=STROKES[ch]; if(!d) return '';
+  const paths=d.strokes.map((p,i)=>{
+    let fill='#E3E8F0';
+    if(upto!==null){ fill = i<upto ? (i===upto-1?'var(--bad)':'var(--ink)') : '#E9EDF3'; }
+    if(mark!==null){ fill = i===mark ? 'var(--bad)' : '#CBD3DF'; }
+    return `<path d="${p}" fill="${fill}"/>`;
+  }).join('');
+  return `<svg class="${cls}" viewBox="0 0 1024 1024" aria-hidden="true">
+    <rect x="8" y="8" width="1008" height="1008" fill="#fff" stroke="none"/>
+    <path d="M512 0V1024M0 512H1024" stroke="#F0C6BF" stroke-width="6" stroke-dasharray="24 18"/>
+    <g transform="translate(0,900) scale(1,-1)">${paths}</g></svg>`;
+}
+
+/* ---------- content ---------- */
+const SUBJECTS = {
+  math:{name:'數學',cls:'math',what:'50 以內加減，含進位、退位',modes:[
+    {id:'add',ico:'+',name:'加法闖關',desc:'答案不超過 50，有進位也有不進位',n:10},
+    {id:'sub',ico:'−',name:'減法闖關',desc:'50 以內，有退位也有不退位',n:10},
+    {id:'mix',ico:'±',name:'加減混合',desc:'加法減法隨機出題',n:10},
+  ]},
+  chin:{name:'國語',cls:'chin',what:'筆順、部首',modes:[
+    {id:'write',ico:'寫',name:'筆順描寫',desc:'先看示範，再用手指或滑鼠照順序寫',n:0},
+    {id:'stroke',ico:'畫',name:'筆順小考',desc:'第幾筆是哪一筆？一共幾畫？',n:10},
+    {id:'radical',ico:'部',name:'部首找一找',desc:'看字選出它的部首',n:10},
+  ]},
+  nat:{name:'自然生活',cls:'nat',what:'植物、動物、生活安全',modes:[
+    {id:'plant',ico:'🌱',name:'植物',desc:'根、莖、葉、花、果實',n:10},
+    {id:'animal',ico:'🐸',name:'動物',desc:'腳有幾隻、住哪裡、怎麼長大',n:10},
+    {id:'life',ico:'🚦',name:'生活安全',desc:'過馬路、洗手、地震、打電話求救',n:10},
+  ]},
+  eng:{name:'英文字母',cls:'eng',what:'A 到 Z，大寫小寫',modes:[
+    {id:'case',ico:'Aa',name:'大小寫配對',desc:'找出一樣的字母小寫',n:10},
+    {id:'listen',ico:'♪',name:'聽聲音選字母',desc:'按喇叭聽字母，選出正確的',n:10},
+    {id:'first',ico:'🍎',name:'看圖找開頭',desc:'apple 是哪個字母開頭？',n:10},
+  ]},
+};
+
+/* 國語：筆順字（只收台灣、大陸筆順相同的基本字） */
+const STROKE_CHARS = '一二三十八七九人入大天小上下土口日月木林山子女手力文中'.split('').filter(c=>STROKES[c]);
+
+/* 國語：部首（依教育部部首歸部） */
+const RADICALS = [
+  {r:'木',form:'木',chars:'林森樹校桌椅果'},
+  {r:'水',form:'氵',chars:'河海洗湖江'},
+  {r:'口',form:'口',chars:'吃喝叫唱'},
+  {r:'人',form:'亻',chars:'你他們住'},
+  {r:'女',form:'女',chars:'好媽姐妹'},
+  {r:'日',form:'日',chars:'明早星晚'},
+  {r:'手',form:'扌',chars:'打拍拉'},
+  {r:'雨',form:'雨',chars:'雪雲電'},
+  {r:'艸',form:'艹',chars:'花草茶'},
+  {r:'足',form:'足',chars:'跑跳路'},
+  {r:'心',form:'心',chars:'想忘'},
+  {r:'言',form:'言',chars:'說話請'},
+];
+
+/* 自然生活 */
+const NATURE = {
+  plant:[
+    ['植物用哪個部位吸水？','🌱',['根','葉子','花'],'植物靠根從土裡吸水。'],
+    ['種子要發芽，需要什麼？','🫘',['水','糖果','牛奶'],'種子要有水、空氣和適合的溫度才會發芽。'],
+    ['大部分植物的葉子是什麼顏色？','🍃',['綠色','藍色','黑色'],'大部分的葉子是綠色的。'],
+    ['植物一直照不到陽光，會怎麼樣？','🌻',['長不好','長得更快','變成動物'],'植物需要陽光才能長得好。'],
+    ['我們吃的香蕉，是植物的哪個部位？','🍌',['果實','根','葉子'],'香蕉是香蕉樹結的果實。'],
+    ['我們吃的紅蘿蔔，是植物的哪個部位？','🥕',['根','花','果實'],'紅蘿蔔長在土裡，是植物的根。'],
+    ['我們吃的高麗菜，主要是植物的哪個部位？','🥬',['葉子','根','種子'],'高麗菜一層一層的，都是葉子。'],
+    ['花謝了以後，常常會長出什麼？','🌸',['果實','石頭','羽毛'],'很多植物開花以後會結出果實，果實裡面有種子。'],
+    ['下面哪一個是植物？','🌳',['大樹','小貓','石頭'],'大樹是植物，會長大、需要水和陽光。'],
+    ['植物會把根長在哪裡？','🪴',['土裡','天空','冰箱'],'根長在土裡，可以抓住土、吸水。'],
+    ['向日葵的花瓣是什麼顏色？','🌻',['黃色','紫色','黑色'],'向日葵的花瓣是黃色的。'],
+    ['想讓盆栽長得好，要怎麼做？','💧',['記得澆水','放進衣櫃','每天拔葉子'],'澆水、照陽光，植物才會長得好。'],
+  ],
+  animal:[
+    ['蝴蝶有幾隻腳？','🦋',['6 隻','4 隻','8 隻'],'蝴蝶是昆蟲，昆蟲有 6 隻腳。'],
+    ['蜘蛛有幾隻腳？','🕷️',['8 隻','6 隻','4 隻'],'蜘蛛有 8 隻腳，牠不是昆蟲。'],
+    ['青蛙小時候叫做什麼？','🐸',['蝌蚪','小雞','毛毛蟲'],'青蛙小時候是蝌蚪，住在水裡。'],
+    ['蝴蝶小時候是什麼？','🐛',['毛毛蟲','蝌蚪','小魚'],'蝴蝶小時候是毛毛蟲，會變成蛹，再變成蝴蝶。'],
+    ['魚在水裡用什麼呼吸？','🐟',['鰓','鼻子','尾巴'],'魚用鰓在水裡呼吸。'],
+    ['下面哪一種動物會生蛋？','🥚',['雞','狗','牛'],'雞會生蛋，小雞從蛋裡孵出來。'],
+    ['小鳥的身上長著什麼？','🐦',['羽毛','鱗片','殼'],'鳥的身上有羽毛。'],
+    ['蚯蚓住在哪裡？','🪱',['土裡','樹上','海裡'],'蚯蚓住在濕濕的土裡。'],
+    ['下面哪一種動物會飛？','🪶',['麻雀','烏龜','兔子'],'麻雀是鳥，會飛。'],
+    ['乳牛可以給我們什麼？','🐄',['牛奶','蜂蜜','雞蛋'],'乳牛會產牛奶。'],
+    ['蜜蜂會去花朵上採什麼？','🐝',['花蜜','樹葉','泥土'],'蜜蜂採花蜜，再做成蜂蜜。'],
+    ['小狗身上長著什麼？','🐶',['毛','羽毛','鱗片'],'小狗身上有毛。'],
+  ],
+  life:[
+    ['行人的紅燈亮了，要怎麼做？','🚦',['停下來等','快點跑過去','邊走邊看手機'],'紅燈要停，等綠燈（小綠人）亮了再走。'],
+    ['過馬路要走哪裡？','🚸',['斑馬線','馬路中間','停好的車子中間'],'過馬路要走斑馬線，左右看清楚。'],
+    ['吃飯前要先做什麼？','🍚',['洗手','玩沙','摸小狗'],'吃東西前要洗手，才不會把細菌吃進去。'],
+    ['濕洗手的第一步是什麼？','🧼',['把手弄濕','用毛巾擦乾','直接吃東西'],'濕洗手五步驟：濕、搓、沖、捧、擦。'],
+    ['地震來了，要怎麼做？','🏠',['趴下、掩護、穩住','跑去搭電梯','站在窗戶旁邊'],'地震時要趴下、掩護、穩住，保護頭和頸部。'],
+    ['看到失火了，要打哪個電話？','🔥',['119','110','123'],'火災、受傷要打 119。'],
+    ['需要警察幫忙，要打哪個電話？','👮',['110','119','100'],'找警察要打 110。'],
+    ['咳嗽或打噴嚏時，要怎麼做？','🤧',['用手帕或衣袖遮住口鼻','對著別人','大聲笑'],'遮住口鼻，才不會把病菌傳給別人。'],
+    ['一天最少要刷幾次牙？','🪥',['2 次','1 次都不用','10 次'],'早上和睡前都要刷牙，睡前一定要刷。'],
+    ['一年有幾個季節？','🍂',['4 個','2 個','7 個'],'一年有春、夏、秋、冬四個季節。'],
+    ['喝完的寶特瓶要怎麼處理？','♻️',['放到回收','丟在路邊','丟進水溝'],'寶特瓶可以回收再利用。'],
+    ['下雨天出門，要帶什麼？','☔',['雨傘','扇子','泳圈'],'下雨天帶雨傘或穿雨衣。'],
+  ],
+};
+
+/* 英文 */
+const LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const CONFUSE={b:'dpq',d:'bpq',p:'qbd',q:'pdb',m:'nw',n:'mh',u:'nv',w:'mv',i:'jl',j:'il',l:'it',h:'nk'};
+const WORDS=[['apple','🍎'],['ball','⚽'],['cat','🐱'],['dog','🐶'],['egg','🥚'],['fish','🐟'],['grapes','🍇'],['hat','🎩'],['ice cream','🍦'],['kite','🪁'],['lion','🦁'],['moon','🌙'],['nose','👃'],['orange','🍊'],['pig','🐷'],['rabbit','🐰'],['sun','☀️'],['tiger','🐯'],['umbrella','☂️'],['violin','🎻'],['watermelon','🍉'],['yo-yo','🪀'],['zebra','🦓']];
+
+/* ---------- question builders ---------- */
+function mathQ(kind){
+  const op = kind==='mix' ? pick(['add','sub']) : kind;
+  let a,b,ans;
+  if(op==='add'){ a=1+rnd(48); b=1+rnd(50-a); ans=a+b; }
+  else { a=2+rnd(49); b=1+rnd(a-1); ans=a-b; }
+  const sym = op==='add'?'+':'−';
+  const carry = op==='add' ? (a%10)+(b%10)>=10 : (a%10)<(b%10);
+  return {type:'input', answer:ans, a, b, op,
+    prompt: op==='add'?'算算看，答案是多少？':'算算看，還剩多少？',
+    say:`${a} ${op==='add'?'加':'減'} ${b} 等於多少？`,
+    visual:`<div class="eq"><span>${a}</span><span>${sym}</span><span>${b}</span><span>=</span><span class="slot" id="slot">&nbsp;</span></div>`,
+    explain:`${a} ${sym} ${b} = ${ans}${carry?(op==='add'?'（個位滿 10，要進位）':'（個位不夠減，要向十位借 1）'):''}`};
+}
+function strokeQ(){
+  const multi=STROKE_CHARS.filter(c=>STROKES[c].strokes.length>=3);
+  if(Math.random()<.4){
+    const c=pick(STROKE_CHARS), n=STROKES[c].strokes.length;
+    const opts=shuffle([n, ...shuffle([n-1,n+1,n+2].filter(x=>x>0)).slice(0,2)]);
+    return {type:'choice', prompt:`「${c}」一共有幾畫？`, say:`${c}，一共有幾畫？`,
+      visual:`<div class="bigchar tian">${c}</div>`,
+      options:opts.map(x=>({html:`${x} 畫`, ok:x===n})), explain:`「${c}」一共 ${n} 畫。`};
+  }
+  const c=pick(multi), n=STROKES[c].strokes.length;
+  const t=rnd(n);
+  const others=shuffle([...Array(n).keys()].filter(i=>i!==t)).slice(0,Math.min(3,n-1));
+  const idx=shuffle([t,...others]);
+  return {type:'choice', grid:idx.length===3?'three':'', prompt:`「${c}」的第 ${t+1} 筆是哪一筆？`, say:`${c}，的第${t+1}筆，是哪一筆？紅色的那一筆。`,
+    visual:`<div class="bigchar tian">${c}</div>`,
+    options:idx.map(i=>({html:strokeSVG(c,{mark:i}), ok:i===t, aria:`選項`})),
+    explain:`紅色是第 ${t+1} 筆。`, after:`<div class="steps" style="margin-top:12px">${[...Array(n).keys()].map(i=>`<figure>${strokeSVG(c,{upto:i+1})}<figcaption>第${i+1}筆</figcaption></figure>`).join('')}</div>`};
+}
+function radicalQ(){
+  const g=pick(RADICALS), c=pick(g.chars.split(''));
+  const opts=shuffle([g,...shuffle(RADICALS.filter(x=>x!==g)).slice(0,3)]);
+  return {type:'choice', prompt:`「${c}」的部首是哪一個？`, say:`${c}，的部首是哪一個？`,
+    visual:`<div class="bigchar tian">${c}</div>`,
+    options:opts.map(x=>({html:`<span class="rad"><span class="kai">${x.form}</span><small>${x.r}部</small></span>`, ok:x===g})),
+    explain:`「${c}」是${g.r}部${g.form!==g.r?`，在字裡寫成「${g.form}」`:''}。同一部的字還有：${g.chars.split('').filter(x=>x!==c).join('、')}。`};
+}
+function natureQs(kind){
+  return shuffle(NATURE[kind]).map(([q,em,opts,ex])=>({type:'choice', grid:'three', prompt:q, say:q,
+    visual:`<div class="emoji" aria-hidden="true">${em}</div>`,
+    options:shuffle(opts.map((o,i)=>({html:esc(o), ok:i===0, say:o}))), explain:ex}));
+}
+function lowerOpts(L){
+  const l=L.toLowerCase(); const pool=(CONFUSE[l]||'').split('').filter(Boolean);
+  const rest=shuffle('abcdefghijklmnopqrstuvwxyz'.split('').filter(x=>x!==l&&!pool.includes(x)));
+  return shuffle([l,...shuffle(pool).slice(0,2),...rest].slice(0,4));
+}
+function engQs(kind,n){
+  if(kind==='case') return shuffle(LETTERS).slice(0,n).map(L=>({type:'choice', prompt:`大寫 ${L} 的小寫是哪一個？`, say:null, sayEn:L,
+    visual:`<div class="abc">${L}</div>`, options:lowerOpts(L).map(x=>({html:`<span class="abc">${x}</span>`, ok:x===L.toLowerCase()})), explain:`${L} 的小寫是 ${L.toLowerCase()}。`}));
+  if(kind==='listen') return shuffle(LETTERS).slice(0,n).map(L=>{
+    const opts=shuffle([L,...shuffle(LETTERS.filter(x=>x!==L)).slice(0,3)]);
+    return {type:'choice', prompt:'按喇叭聽聽看，是哪個字母？', say:null, sayEn:L, autoSay:true,
+      visual:`<button class="say" style="width:96px;height:96px" data-en="${L}" aria-label="再聽一次">${SPK}</button>`,
+      options:opts.map(x=>({html:`<span class="abc">${x}</span>`, ok:x===L})), explain:`聽到的是 ${L}。`};});
+  return shuffle(WORDS).slice(0,n).map(([w,em])=>{
+    const L=w[0].toUpperCase();
+    const opts=shuffle([L,...shuffle(LETTERS.filter(x=>x!==L)).slice(0,3)]);
+    return {type:'choice', prompt:'這個英文單字是哪個字母開頭？', say:null, sayEn:w,
+      visual:`<div class="emoji" aria-hidden="true">${em}</div><div class="word"><u>&nbsp;</u>${esc(w.slice(1))}</div>`,
+      options:opts.map(x=>({html:`<span class="abc">${x}</span>`, ok:x===L})), explain:`${w} 是 ${L} 開頭。`};});
+}
+function buildRound(subj,mode){
+  const n=10;
+  if(subj==='math') return Array.from({length:n},()=>mathQ(mode));
+  if(subj==='chin') return Array.from({length:n},()=>mode==='stroke'?strokeQ():radicalQ());
+  if(subj==='nat') return natureQs(mode).slice(0,n);
+  return engQs(mode,n);
+}
+
+/* ---------- screens ---------- */
+let cleanup=null;
+function go(fn){ if(cleanup){cleanup();cleanup=null;} try{speechSynthesis.cancel();}catch(e){} fn(); window.scrollTo({top:0}); }
+
+function topbar(backTo){
+  return `<div class="top">${backTo?`<button class="back" id="backBtn">${BACK}返回</button>`:`<div class="brand"><h1>小一闖關本</h1><a class="home" href="index.html">← 回橡果森林</a></div>`}
+    <div class="starbox" aria-label="星星總數">${STAR()}<span>${totalStars()}</span></div></div>`;
+}
+
+function home(){
+  const cards=Object.entries(SUBJECTS).map(([k,s])=>{
+    const max=s.modes.filter(m=>m.n).length*3;
+    const got=s.modes.reduce((a,m)=>a+(save.best[k+'-'+m.id]||0),0);
+    const extra = k==='chin' ? `<dt>描寫</dt><dd>${Object.keys(save.written).length} / ${STROKE_CHARS.length} 字</dd>` : '';
+    return `<button class="cover ${s.cls}" data-s="${k}">
+      <div class="big">${s.name}</div><div class="what">${s.what}</div>
+      <dl class="label"><dt>科目</dt><dd>${s.name}</dd><dt>星星</dt><dd>${got} / ${max}</dd>${extra}</dl></button>`;
+  }).join('');
+  app.innerHTML = topbar() + `<div class="covers">${cards}</div>
+    <div class="note"><b>給家長：</b>每一關 10 題，答對 9 題以上得 3 顆星。題目可以按喇叭朗讀（要看裝置有沒有中文語音）。星星只存在這台裝置的瀏覽器。
+    筆順資料來自開源的 Make Me a Hanzi，只收台灣與大陸筆順一致的基本字；若要對照標準，請看
+    <a href="https://stroke-order.learningweb.moe.edu.tw/" target="_blank" rel="noopener">教育部筆順學習網</a>。</div>`;
+  app.querySelectorAll('.cover').forEach(b=>b.onclick=()=>go(()=>menu(b.dataset.s)));
+}
+
+function menu(k){
+  const s=SUBJECTS[k];
+  app.innerHTML = topbar(true) + `<div class="sheet ${s.cls}">
+    <div class="sheet-head"><span class="chip">${s.name}</span></div>
+    <h2>選一個關卡</h2><p class="sub">${s.what}</p>
+    <div class="modes">${s.modes.map(m=>{
+      const best=save.best[k+'-'+m.id]||0;
+      const got = m.n ? `<span class="got" aria-label="最佳 ${best} 顆星">${STAR(best>0)}${STAR(best>1)}${STAR(best>2)}</span>`
+                      : `<span class="qnum">${Object.keys(save.written).length}/${STROKE_CHARS.length}</span>`;
+      return `<button class="mode" data-m="${m.id}"><span class="ico">${m.ico}</span><span><h3>${m.name}</h3><p>${m.desc}</p></span>${got}</button>`;}).join('')}
+    </div></div>`;
+  $('#backBtn').onclick=()=>go(home);
+  app.querySelectorAll('.mode').forEach(b=>b.onclick=()=>go(()=> b.dataset.m==='write' ? writeScreen(k) : play(k,b.dataset.m)));
+}
+
+function play(k,mode){
+  const s=SUBJECTS[k], qs=buildRound(k,mode);
+  let i=0, right=0, wrongs=[], locked=false, timer=null;
+  const onKey=e=>{
+    if(!app.querySelector('.keypad')) return;
+    if(/^[0-9]$/.test(e.key)) app.querySelector(`.key[data-k="${e.key}"]`)?.click();
+    else if(e.key==='Backspace') app.querySelector('.key.del')?.click();
+    else if(e.key==='Enter'){ e.preventDefault(); (app.querySelector('.next')||app.querySelector('.key.go'))?.click(); }
+  };
+  document.addEventListener('keydown',onKey);
+  cleanup=()=>{clearTimeout(timer); document.removeEventListener('keydown',onKey);};
+
+  function render(){
+    const q=qs[i]; locked=false;
+    const speakBtn = (q.say||q.sayEn) && !q.autoSay ? `<button class="say" id="sayBtn" aria-label="唸出來">${SPK}</button>` : '';
+    app.innerHTML = topbar(true) + `<div class="sheet ${s.cls}">
+      <div class="qbar"><div class="prog"><i style="width:${i/qs.length*100}%"></i></div><span class="qnum">${i+1} / ${qs.length}</span></div>
+      <div class="prompt"><span class="t">${esc(q.prompt)}</span>${speakBtn}</div>
+      <div class="visual">${q.visual}</div>
+      ${q.type==='input'?inputUI(q):choiceUI(q)}
+      <div class="feedback" id="fb"><span class="m" id="fbm"></span></div>
+      <div id="after"></div></div>`;
+    $('#backBtn').onclick=()=>go(()=>menu(k));
+    const sb=$('#sayBtn'); if(sb) sb.onclick=()=>q.sayEn?speak(q.sayEn,'en-US'):speak(q.say);
+    app.querySelectorAll('[data-en]').forEach(b=>b.onclick=()=>speak(b.dataset.en,'en-US'));
+    if(q.autoSay) setTimeout(()=>speak(q.sayEn,'en-US'),250);
+    if(q.type==='input') bindInput(q); else bindChoice(q);
+  }
+  function choiceUI(q){
+    return `<div class="opts ${q.grid||''}">${q.options.map((o,j)=>`<button class="opt" data-j="${j}"${o.aria?` aria-label="選項 ${j+1}"`:''}>${o.html}</button>`).join('')}</div>`;
+  }
+  function bindChoice(q){
+    app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{
+      if(locked) return; locked=true;
+      const o=q.options[+b.dataset.j];
+      app.querySelectorAll('.opt').forEach(x=>{x.disabled=true; if(q.options[+x.dataset.j].ok) x.classList.add('right');});
+      if(!o.ok) b.classList.add('wrong');
+      done(o.ok,q);
+    });
+  }
+  function inputUI(q){
+    const keys=[1,2,3,4,5,6,7,8,9,0];
+    return `<div style="text-align:center;margin:-4px 0 12px"><button class="hintbtn" id="hint">看積木提示</button></div><div id="blocks"></div>
+      <div class="keypad">${keys.map(n=>`<button class="key" data-k="${n}">${n}</button>`).join('')}
+      <button class="key del" data-k="del">擦掉</button><button class="key go" data-k="ok">確定</button></div>`;
+  }
+  function blockHTML(n,label){
+    const t=Math.floor(n/10), o=n%10;
+    return `<div class="bset"><div class="bgrp">${'<span class="ten"></span>'.repeat(t)}<span class="ones">${'<span class="one"></span>'.repeat(o)}</span></div><span>${label} ${n}：${t} 個十、${o} 個一</span></div>`;
+  }
+  function bindInput(q){
+    let val='';
+    const slot=$('#slot');
+    const show=()=>{slot.textContent=val||' ';};
+    $('#hint').onclick=()=>{$('#blocks').innerHTML=`<div class="blocks">${blockHTML(q.a,'')}${blockHTML(q.b,q.op==='add'?'加':'減')}</div>`;};
+    app.querySelectorAll('.key').forEach(b=>b.onclick=()=>{
+      if(locked) return;
+      const k2=b.dataset.k;
+      if(k2==='del') val=val.slice(0,-1);
+      else if(k2==='ok'){ if(val==='') return; locked=true; const ok=+val===q.answer; slot.style.color=ok?'var(--ok)':'var(--bad)'; done(ok,q); return; }
+      else if(val.length<2) val=(val==='0'?'':val)+k2;
+      show();
+    });
+  }
+  function done(ok,q){
+    beep(ok);
+    if(ok) right++; else wrongs.push(q.explain);
+    const m=$('#fbm');
+    m.innerHTML = ok ? `<span class="yes">答對了！</span> ${esc(q.explain)}` : `<span class="no">再想想。</span>正確答案：${esc(q.explain)}`;
+    if(q.after && !ok) $('#after').innerHTML=q.after;
+    const nb=document.createElement('button'); nb.className='next'; nb.textContent = i===qs.length-1?'看結果':'下一題';
+    nb.onclick=()=>{clearTimeout(timer); next();};
+    $('#fb').appendChild(nb);
+    if(ok) timer=setTimeout(next,1600);
+    nb.focus({preventScroll:true});
+  }
+  function next(){
+    if(!document.body.contains($('#fb'))) return;
+    i++; if(i<qs.length) render(); else result();
+  }
+  function result(){
+    const stars = right>=9?3:right>=7?2:right>=5?1:0;
+    const key=k+'-'+mode; const prev=save.best[key]||0;
+    if(stars>prev){save.best[key]=stars; persist();}
+    const msg = stars===3?'太厲害了！':stars===2?'很棒，再一次就三顆星！':stars===1?'有進步，再練一次！':'沒關係，再試一次會更好。';
+    app.innerHTML = topbar(true) + `<div class="sheet ${s.cls}"><div class="result">
+      <h2>${msg}</h2>
+      <div class="stars">${[0,1,2].map(j=>STAR(j<stars).replace('class="star"',`class="star${j<stars?' pop':''}"`)).join('')}</div>
+      <p class="score">答對 ${right} / ${qs.length} 題</p>
+      ${wrongs.length?`<ol class="review">${wrongs.map(w=>`<li>${esc(w)}</li>`).join('')}</ol>`:''}
+      <div class="btns"><button class="wbtn pri" id="again">再玩一次</button><button class="wbtn" id="tomenu">換一關</button></div></div></div>`;
+    $('#backBtn').onclick=()=>go(()=>menu(k));
+    $('#again').onclick=()=>go(()=>play(k,mode));
+    $('#tomenu').onclick=()=>go(()=>menu(k));
+    if(stars) beep(true);
+  }
+  render();
+}
+
+function writeScreen(k){
+  const s=SUBJECTS[k];
+  let cur = STROKE_CHARS.find(c=>!save.written[c]) || STROKE_CHARS[0];
+  let writer=null;
+  const hasLib = typeof HanziWriter!=='undefined';
+
+  function render(){
+    const n=STROKES[cur].strokes.length;
+    app.innerHTML = topbar(true) + `<div class="sheet ${s.cls}">
+      <div class="sheet-head"><span class="chip">筆順描寫</span></div>
+      <p class="sub">選一個字。先按「看示範」，再按「開始寫」，照順序一筆一筆寫。寫錯兩次會出現提示。</p>
+      <div class="charrow">${STROKE_CHARS.map(c=>`<button class="cchip${c===cur?' on':''}${save.written[c]?' done':''}" data-c="${c}" aria-label="${c}${save.written[c]?'，寫過了':''}">${c}</button>`).join('')}</div>
+      <div class="writegrid">
+        <div>
+          <div class="board" id="board"><svg class="bg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M50 0V100M0 50H100" stroke="#E7A79B" stroke-width=".6" stroke-dasharray="3 2.4"/></svg><div class="hw" id="hw"></div></div>
+          <div class="wbtns"><button class="wbtn" id="demo">看示範</button><button class="wbtn pri" id="quiz">開始寫</button><button class="wbtn" id="sayc" aria-label="唸出這個字">${SPK.replace('<svg','<svg width="20" height="20" style="vertical-align:-4px"')}</button></div>
+          <div class="wmsg" id="wmsg"></div>
+        </div>
+        <div class="side"><h3>「${cur}」的筆順</h3><p class="count">一共 ${n} 畫</p>
+          <div class="steps">${[...Array(n).keys()].map(i=>`<figure>${strokeSVG(cur,{upto:i+1})}<figcaption>第${i+1}筆</figcaption></figure>`).join('')}</div></div>
+      </div></div>`;
+    $('#backBtn').onclick=()=>go(()=>menu(k));
+    app.querySelectorAll('.cchip').forEach(b=>b.onclick=()=>{cur=b.dataset.c; render();});
+    $('#sayc').onclick=()=>speak(cur);
+    const msg=$('#wmsg');
+    if(!hasLib){ msg.textContent='描寫功能載入失敗（可能沒有網路），右邊的筆順分解圖還是可以看。'; $('#demo').disabled=$('#quiz').disabled=true; return; }
+    const size=$('#board').clientWidth;
+    writer=HanziWriter.create('hw',cur,{width:size,height:size,padding:size*.06,
+      charDataLoader:(c,onLoad)=>onLoad(STROKES[c]),
+      showOutline:true, strokeColor:'#1F2A44', outlineColor:'#E3E8F0', highlightColor:'#2E9E5B',
+      drawingColor:'#3563C9', drawingWidth:Math.max(14,size/16), strokeAnimationSpeed:1, delayBetweenStrokes:350});
+    $('#demo').onclick=()=>{ msg.textContent='看清楚順序喔。'; writer.cancelQuiz?.(); writer.showCharacter(); writer.animateCharacter({onComplete:()=>{msg.textContent='換你寫寫看！';}}); };
+    $('#quiz').onclick=()=>{
+      msg.textContent='從第 1 筆開始寫。'; writer.hideCharacter();
+      writer.quiz({showHintAfterMisses:2, leniency:1.1,
+        onCorrectStroke:d=>{ msg.textContent = d.strokesRemaining? `第 ${d.strokeNum+1} 筆對了！` : ''; },
+        onMistake:d=>{ msg.textContent = `第 ${d.strokeNum+1} 筆不太對，再試一次。`; },
+        onComplete:sum=>{
+          const good=sum.totalMistakes<=2;
+          beep(good);
+          if(good && !save.written[cur]){ save.written[cur]=true; persist(); }
+          msg.innerHTML = good ? `<span style="color:var(--ok)">寫完了！得到一顆星。</span>` : `寫完了，錯了 ${sum.totalMistakes} 次。再寫一次會更好！`;
+          const ch=app.querySelector(`.cchip[data-c="${cur}"]`); if(good&&ch) ch.classList.add('done');
+          const sb=app.querySelector('.starbox span'); if(sb) sb.textContent=totalStars();
+        }});
+    };
+  }
+  render();
+}
+
+home();
+</script>
+
+</body>
+</html>
