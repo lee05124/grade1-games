@@ -616,10 +616,30 @@ function tfHanzi(){
   return {e:'📝', s:`「${h.c}」的注音是 ${p}`, a:truth, x:`${h.w}的「${h.c}」唸 ${h.p}。`, speech:`${h.w}的${h.c}，注音是這樣寫的嗎？`};
 }
 
-let recent = [];
-function fresh(key, maker){
-  for(let i=0;i<30;i++){ const v = maker(); if(!recent.includes(key(v))){ recent.push(key(v)); if(recent.length>4) recent.shift(); return v; } }
-  return maker();
+// 出題不重複：同一局不出重複的題目；上一兩局考過的題目（每個遊戲記住最近 15 題）先避開
+let recent = [], used = new Set();
+const PAST_MAX = 15;
+let past = store.get('acorn-recent', {});
+function remember(id){
+  const g = S && S.game; if(!g) return;
+  const a = (past[g]||[]).filter(k=>k!==id); a.push(id);
+  if(a.length>PAST_MAX) a.splice(0, a.length-PAST_MAX);
+  past[g] = a; store.set('acorn-recent', past);
+}
+function fresh(key, maker, id){
+  id = id || key;
+  const old = new Set((S && past[S.game]) || []);
+  let v;
+  for(let i=0;i<80;i++){
+    v = maker(); const k = key(v), u = String(id(v));
+    if(recent.includes(k) && i<30) continue;
+    if(used.has(u) && i<70) continue;
+    if(old.has(u) && i<50) continue;
+    recent.push(k); if(recent.length>4) recent.shift();
+    used.add(u); remember(u);
+    return v;
+  }
+  return v;
 }
 
 const GAMES = {
@@ -685,7 +705,7 @@ const GAMES = {
 
   zhuyin: {
     make(r){
-      const word = fresh(w=>w.z, ()=>pick(WORDS));
+      const word = fresh(w=>w.z, ()=>pick(WORDS), w=> r%2 ? 'z:'+w.z : w.w); // 看注音選圖時，同一個注音算同一題
       const close = r>=5;
       const others = otherInits(word.z, close);
       const pron = el('div','pron','　');
@@ -1139,7 +1159,7 @@ function renderDots(){
 
 function startGame(g){
   S = {game:g, round:0, firstTry:0, results:[], wrong:false, locked:false, q:null};
-  recent = [];
+  recent = []; used = new Set();
   show('play'); nextRound();
 }
 
